@@ -13,6 +13,18 @@ function Form() {
   const [campos, setCampos] = useState<Record<string, string>>({});
   const [enviando, setEnviando] = useState(false);
 
+  function formatarTelefone(valor: string) {
+    const numeros = valor.replace(/\D/g, '');
+
+    // Remove o código 55 caso já esteja presente
+    const numeroSemCodigo = numeros.startsWith('55')
+      ? numeros.slice(2)
+      : numeros;
+
+    // Limita a 11 dígitos (DDD + telefone)
+    return '(+55) ' + numeroSemCodigo.slice(0, 11);
+  }
+
   async function enviar(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const f = new FormData(e.currentTarget);
@@ -44,11 +56,29 @@ function Form() {
     <div className="auth">
       <h1>Crie sua conta</h1>
       <form onSubmit={enviar} className="auth-card">
-        {campo('nome', 'Nome do negócio',  { placeholder: 'Cabeleleira Leila'})}
+        {campo('nome', 'Nome do negócio', { placeholder: 'Cabeleleira Leila' })}
         {campo('slug', 'Endereço do seu link', { placeholder: '(agendafacil.com/agendar/nome-do-negocio)', pattern: '[a-z0-9\\-]{3,60}', title: 'Minúsculas, números e hífen' })}
-        {campo('cnpjCpf', 'CNPJ ou CPF', { placeholder: 'CPF XXX.XXX.XXX-XX CNPJ XX.XXX.XXX/0001-XX'})}
-        {campo('email', 'E-mail de acesso', { placeholder:'email@exemplo.com.br', type: 'email' })}
-        {campo('telefone', 'Contato da empresa (opcional)', { placeholder: 'Ex: +5582999990000' })}
+        {campo('cnpjCpf', 'CNPJ ou CPF', { placeholder: 'CPF XXX.XXX.XXX-XX CNPJ XX.XXX.XXX/0001-XX' })}
+        {campo('email', 'E-mail de acesso', { placeholder: 'email@exemplo.com.br', type: 'email' })}
+        {campo('telefone', 'Contato da empresa (obrigatorio)', {
+          type: 'tel',
+          defaultValue: '(+55) ',
+          placeholder: 'Ex: +5582999990000',
+          inputMode: 'numeric',
+          onChange: (e) => {
+            const valor = e.target.value;
+            e.target.value = formatarTelefone(valor);
+          },
+          onKeyDown: (e) => {
+            if (
+              e.currentTarget.selectionStart !== null &&
+              e.currentTarget.selectionStart <= 3 &&
+              ['Backspace', 'Delete'].includes(e.key)
+            ) {
+              e.preventDefault();
+            }
+          }
+        })}
         <label htmlFor="senha">Senha (mínimo 8 caracteres)</label>
         <PasswordInput id="senha" name="senha" autoComplete="new-password" minLength={8} />
         {campos.senha && <span className="erro-campo">{campos.senha}</span>}

@@ -44,8 +44,8 @@ function Form() {
     <div className="auth">
       <h1>Crie sua conta</h1>
       <form onSubmit={enviar} className="auth-card">
-        {campo('nome', 'Nome do negócio',  { placeholder: 'Cabeleleira Leila'})}
-        {campo('slug', 'Endereço do seu link', { placeholder: '(agendafacil.com/agendar/nome-do-negocio)', pattern: '[a-z0-9\\-]{3,60}', title: 'Minúsculas, números e hífen' })}
+        {campo('nome', 'Nome do negócio', )}
+        {campo('slug', 'Endereço do seu link', { placeholder: 'nome-do-negocio', pattern: '[a-z0-9\\-]{3,60}', title: 'Minúsculas, números e hífen' })}
         {campo('cnpjCpf', 'CNPJ ou CPF', { placeholder: 'CPF XXX.XXX.XXX-XX CNPJ XX.XXX.XXX/0001-XX'})}
         {campo('email', 'E-mail de acesso', { placeholder:'email@exemplo.com.br', type: 'email' })}
         {campo('telefone', 'Contato da empresa (opcional)', { placeholder: 'Ex: +5582999990000' })}

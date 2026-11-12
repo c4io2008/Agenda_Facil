@@ -2,6 +2,7 @@
 import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { api, ApiError, brl, hoje, localParaUTC, mensagemDeErro } from '@/lib/api';
+import './page.css';
 
 interface Pagina {
   id: string; nome: string; fusoHorario: string; catalogoPublico: boolean; tituloAgenda: string | null; logoUrl: string | null;
@@ -54,8 +55,8 @@ export default function Agendar() {
     }
   }
 
-  if (indisponivel) return <main className="narrow"><h1>Agendamento temporariamente indisponível</h1><p>Tente novamente mais tarde.</p></main>;
-  if (!pag) return <main className="narrow"><p>Carregando…</p></main>;
+  if (indisponivel) return <main className="narrow pub-agendar"><h1>Agendamento temporariamente indisponível</h1><p>Tente novamente mais tarde.</p></main>;
+  if (!pag) return <main className="narrow pub-agendar"><p>Carregando…</p></main>;
 
   if (codigo) {
     return (

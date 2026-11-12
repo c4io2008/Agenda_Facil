@@ -11,7 +11,7 @@ npx prisma generate
 npx prisma migrate dev --name init      # cria a migration inicial
 SEED_ADMIN_EMAIL=voce@agendafacil.com SEED_ADMIN_SENHA='senha-forte' npm run seed:plataforma
 npm run dev                             # API em :3333
-cd ../frontend && cp .env.example .env.local && npm install && npm run dev   # :3000
+cd frontend && cp .env.example .env.local && npm install && npm run dev   # :3000
 ```
 
 ## Testes

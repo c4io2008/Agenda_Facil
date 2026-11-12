@@ -1,6 +1,6 @@
 'use client';
 import { useCallback, useEffect, useState } from 'react';
-import PainelShell from '@/components/PainelShell';
+import PainelShell from '@/components/PainelShell'; 
 import { api, brl, mensagemDeErro } from '@/lib/api';
 import './page.css';
 

@@ -58,7 +58,7 @@ export interface NovoEstabelecimento {
 }
 
 export type DadosEstabelecimento = Partial<
-  Pick<Estabelecimento, 'nome' | 'slug' | 'telefone' | 'fusoHorario' | 'intervaloGradeMinutos' | 'catalogoPublico' | 'plano' | 'status' | 'tituloAgenda' | 'logoUrl'>
+  Pick<Estabelecimento, 'nome' | 'slug' | 'telefone' | 'fusoHorario' | 'intervaloGradeMinutos' | 'catalogoPublico' | 'plano' | 'status' | 'tituloAgenda' | 'logoUrl' | 'tema'>
 >;
 
 export interface EstabelecimentoRepo {

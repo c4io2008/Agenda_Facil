@@ -62,6 +62,7 @@ export const estabelecimentoPatchSchema = z.object({
   intervaloGradeMinutos: z.number().int().min(5).max(120).optional(),
   catalogoPublico: z.boolean().optional(),
   tituloAgenda: z.string().trim().max(60).nullable().optional(),
+  tema: z.enum(['lima', 'oceano', 'rosa', 'ambar', 'claro']).optional(),
   logoUrl: z
     .string()
     .trim()

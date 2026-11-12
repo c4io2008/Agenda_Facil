@@ -4,23 +4,23 @@
    ========================================= */
 
 .painel-agenda {
-  --lima: #d6ff72;
-  --verde: #86e05a;
-  --grafite: #222222;
-  --grafite-claro: #292929;
+  --lima: var(--t-destaque);
+  --verde: var(--t-destaque-2);
+  --grafite: var(--t-card-b);
+  --grafite-claro: var(--t-card-a);
 
   width: min(100% - 2rem, 800px);
   margin: 0 auto;
   padding: 1rem 0 3rem;
-  color: #fff;
+  color: var(--t-texto);
   font-family: 'DM Sans', system-ui, sans-serif;
 }
 
 /* FUNDO */
 
 body {
-  background: #000;
-  color: #fff;
+  background: var(--t-fundo);
+  color: var(--t-texto);
 }
 
 /* =========================================
@@ -41,12 +41,12 @@ body {
    ========================================= */
 
 .painel-agenda .card {
-  background: linear-gradient(145deg, #292929, #202020);
-  border: 1px solid rgba(255, 255, 255, .035);
+  background: linear-gradient(145deg, var(--t-card-a), var(--t-card-b));
+  border: 1px solid var(--t-vidro);
   border-radius: 13px;
   padding: 1rem;
   margin-bottom: .75rem;
-  color: #fff;
+  color: var(--t-texto);
   box-sizing: border-box;
 }
 
@@ -152,8 +152,8 @@ body {
   box-sizing: border-box;
   height: 39px;
   padding: .55rem .8rem;
-  background: #c9d1db;
-  color: #111;
+  background: var(--t-input);
+  color: var(--t-input-texto);
   border: 0;
   border-radius: 9px;
   font-family: inherit;
@@ -188,8 +188,8 @@ body {
   display: inline-block;
   padding: .15rem .55rem;
   border-radius: 20px;
-  background: #c9d1db;
-  color: #222;
+  background: var(--t-input);
+  color: var(--t-input-texto);
   font-size: .75rem;
   font-weight: 600;
 }
@@ -242,7 +242,7 @@ body {
    ========================================= */
 
 .painel-agenda fieldset {
-  border: 1px solid #454545;
+  border: 1px solid var(--t-borda);
   padding: .6rem .75rem;
   margin: .55rem 0;
   min-width: 0;
@@ -285,7 +285,7 @@ body {
     var(--lima)
   );
 
-  color: #000;
+  color: var(--t-btn-texto);
   border: none;
   border-radius: 12px;
 
@@ -348,7 +348,7 @@ body {
 }
 
 .painel-agenda button.sec:hover {
-  background: rgba(214, 255, 114, .10);
+  background: var(--t-destaque-fraco);
 }
 
 .painel-agenda button:active,
@@ -409,7 +409,7 @@ body {
    ========================================= */
 
 .painel-agenda .erro {
-  color: #ff9b94;
+  color: var(--t-erro);
   font-weight: 600;
   margin: .7rem 0;
 }
@@ -420,7 +420,7 @@ body {
 }
 
 .painel-agenda small {
-  color: #c4c4c4;
+  color: var(--t-suave);
 }
 
 /* =========================================
@@ -516,7 +516,7 @@ body {
 .painel-agenda > .agenda-titulo {
   width: 100%;
   margin: 0 0 1.5rem;
-  color: #d6ff72;
+  color: var(--t-destaque);
   font-size: 2rem;
   font-weight: 800;
 }
@@ -591,8 +591,8 @@ nav.nav {
   width: 100%;
   box-sizing: border-box;
   padding: .9rem 1.2rem;
-  background: #000;
-  border-bottom: 2px solid #86e05a;
+  background: var(--t-fundo);
+  border-bottom: 2px solid var(--t-destaque-2);
   font-family: 'DM Sans', system-ui, sans-serif;
 }
 
@@ -605,7 +605,7 @@ nav.nav .marca {
   font-size: 1.15rem;
   font-weight: 800;
   letter-spacing: -.03em;
-  color: #d6ff72;
+  color: var(--t-destaque);
 }
 
 nav.nav .marca-logo {
@@ -615,7 +615,7 @@ nav.nav .marca-logo {
 }
 
 nav.nav a {
-  color: #fff;
+  color: var(--t-texto);
   font-size: .9rem;
   font-weight: 600;
   text-decoration: none;
@@ -623,12 +623,12 @@ nav.nav a {
 }
 
 nav.nav a:hover {
-  color: #d6ff72;
+  color: var(--t-destaque);
 }
 
 nav.nav a:focus-visible,
 nav.nav button:focus-visible {
-  outline: 3px solid #d6ff72;
+  outline: 3px solid var(--t-destaque);
   outline-offset: 3px;
 }
 
@@ -640,8 +640,8 @@ nav.nav button.sec {
   min-height: 38px;
   padding: 9px 14px;
   background: transparent;
-  color: #d6ff72;
-  border: 1.5px solid #d6ff72;
+  color: var(--t-destaque);
+  border: 1.5px solid var(--t-destaque);
   border-radius: 12px;
   font-family: 'DM Sans', sans-serif;
   font-size: 13px;
@@ -651,7 +651,7 @@ nav.nav button.sec {
 }
 
 nav.nav button.sec:hover {
-  background: rgba(214, 255, 114, .10);
+  background: var(--t-destaque-fraco);
 }
 
 nav.nav button.sec:active {

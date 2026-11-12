@@ -3,7 +3,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { api, tokens } from '@/lib/api';
+import { aplicarTema, limparTema, temaSalvo } from '@/lib/temas';
 import './PainelShell.css';
+
 
 export interface Assinatura {
   plano: string; status: string; valorMensal: number; proximaCobranca: string | null;
@@ -15,13 +17,15 @@ export default function PainelShell({ children, onAssinatura }: { children: Reac
   const router = useRouter();
   const [ass, setAss] = useState<Assinatura | null>(null);
   const [marca, setMarca] = useState<{ nome: string; logoUrl: string | null } | null>(null);
-
+  useEffect(() => { aplicarTema(temaSalvo()); return () => limparTema(); }, []);
   useEffect(() => {
     if (!tokens.ler('contratante')) { router.replace('/login'); return; }
     api<Assinatura>('/assinatura', { auth: 'contratante' })
       .then((a) => { setAss(a); onAssinatura?.(a); })
       .catch(() => { tokens.limpar('contratante'); router.replace('/login'); });
-    api<{ nome: string; logoUrl: string | null }>('/estabelecimentos/me', { auth: 'contratante' }).then(setMarca).catch(() => {});
+    api<{ nome: string; logoUrl: string | null; tema: string }>('/estabelecimentos/me', { auth: 'contratante' })
+  .then((m) => { setMarca(m); aplicarTema(m.tema); })
+  .catch(() => {});
   }, [router]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (

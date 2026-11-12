@@ -1,7 +1,7 @@
 :root {
   --fundo: #f4f6f5; --papel: #ffffff; --tinta: #16211d; --suave: #5b6b64; --linha: #d9e0dc;
   --marca: #0b6e5b; --marca-escura: #084f41; --destaque: #e8a33d; --erro: #b3261e; --ok: #1d7a46;
-  --raio: 8px;
+  --raio: 8px; --campo: #fff; --on-marca: #fff; --aviso-fundo: #fff4dc; --erro-fundo: #fde8e6;
 }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--fundo); color: var(--tinta); font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
@@ -13,29 +13,110 @@ main, .wrap { max-width: 960px; margin: 0 auto; padding: 1.25rem; }
 .card { background: var(--papel); border: 1px solid var(--linha); border-radius: var(--raio); padding: 1rem; margin-bottom: .75rem; }
 .grid { display: grid; gap: .75rem; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
 label { display: block; font-weight: 600; margin: .75rem 0 .25rem; }
-input, select { width: 100%; padding: .65rem .75rem; border: 1px solid var(--linha); border-radius: var(--raio); font: inherit; background: #fff; }
+input, select { width: 100%; padding: .65rem .75rem; border: 1px solid var(--linha); border-radius: var(--raio); font: inherit; 	background: var(--campo); color: inherit;; }
 input:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible { outline: 3px solid var(--destaque); outline-offset: 2px; }
-button, .btn { display: inline-block; padding: .65rem 1rem; border: 0; border-radius: var(--raio); background: var(--marca); color: #fff; font: inherit; font-weight: 600; cursor: pointer; text-decoration: none; }
+button, .btn { display: inline-block; padding: .65rem 1rem; border: 0; border-radius: var(--raio); background: var(--marca); color: var(--on-marca); font: inherit; font-weight: 600; cursor: pointer; text-decoration: none; }
 button:hover, .btn:hover { background: var(--marca-escura); }
 button:disabled { opacity: .5; cursor: not-allowed; }
 button.sec, .btn.sec { background: transparent; color: var(--marca); border: 1px solid var(--marca); }
 button.perigo { background: var(--erro); }
 .slots { display: flex; flex-wrap: wrap; gap: .5rem; }
 .slots button { background: #fff; color: var(--marca); border: 1px solid var(--marca); }
-.slots button[aria-pressed="true"] { background: var(--marca); color: #fff; }
+.slots button[aria-pressed="true"] { background: var(--marca); background: var(--papel); }
 .erro { color: var(--erro); font-weight: 600; }
 .ok { color: var(--ok); font-weight: 600; }
-.aviso { background: #fff4dc; border: 1px solid var(--destaque); border-radius: var(--raio); padding: .75rem 1rem; margin-bottom: 1rem; }
-.aviso.grave { background: #fde8e6; border-color: var(--erro); }
+.aviso { background: var(--aviso-fundo); border: 1px solid var(--destaque); border-radius: var(--raio); padding: .75rem 1rem; margin-bottom: 1rem; }
+.aviso.grave { background: var(--erro-fundo); border-color: var(--erro); }
 .nav { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; padding: .75rem 1.25rem; background: var(--papel); border-bottom: 1px solid var(--linha); }
 .nav .sp { margin-left: auto; }
 .preco { font-size: 1.6rem; font-weight: 700; }
 .linha { display: flex; justify-content: space-between; gap: 1rem; align-items: center; flex-wrap: wrap; }
 .tag { font-size: .85rem; padding: .1rem .5rem; border-radius: 99px; background: var(--linha); }
-.tag.falha { background: #fde8e6; color: var(--erro); }
+.tag.falha { background: var(--erro-fundo); color: var(--erro); }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 
 .marca { display: inline-flex; align-items: center; gap: .5rem; }
 .marca-logo { height: 32px; width: auto; max-width: 120px; object-fit: contain; border-radius: 4px; }
 .pub-logo { display: block; max-height: 80px; max-width: 100%; object-fit: contain; margin: 0 0 .75rem; }
 .pub-sub { color: var(--suave); margin: 0 0 1rem; }
+
+
+/* ===== TEMAS ===== */
+:root,
+html[data-tema="lima"] {
+  --t-fundo: #000000; --t-card-a: #292929; --t-card-b: #202020;
+  --t-texto: #ffffff; --t-suave: #e0e0e0; --t-borda: #555555;
+  --t-input: #c9d1db; --t-input-texto: #111111;
+  --t-destaque: #d6ff72; --t-destaque-2: #86e05a; --t-btn-texto: #000000;
+  --t-destaque-fraco: rgba(214, 255, 114, .16);
+  --t-vidro: rgba(255, 255, 255, .07); --t-erro: #ff9b94;
+}
+
+html[data-tema="oceano"] {
+  --t-fundo: #050b14; --t-card-a: #101d2d; --t-card-b: #15263a;
+  --t-texto: #ffffff; --t-suave: #d5e3f0; --t-borda: #38516b;
+  --t-input: #dce8f5; --t-input-texto: #101820;
+  --t-destaque: #5ee7ff; --t-destaque-2: #3b82f6; --t-btn-texto: #050b14;
+  --t-destaque-fraco: rgba(94, 231, 255, .16);
+  --t-vidro: rgba(255, 255, 255, .07); --t-erro: #ff9999;
+}
+
+html[data-tema="rosa"] {
+  --t-fundo: #0d0509; --t-card-a: #25111f; --t-card-b: #301729;
+  --t-texto: #ffffff; --t-suave: #f0d9e5; --t-borda: #63405a;
+  --t-input: #f2dce9; --t-input-texto: #1a1017;
+  --t-destaque: #ff8ad8; --t-destaque-2: #c084fc; --t-btn-texto: #1a1017;
+  --t-destaque-fraco: rgba(255, 138, 216, .16);
+  --t-vidro: rgba(255, 255, 255, .07); --t-erro: #ff9999;
+}
+
+html[data-tema="ambar"] {
+  --t-fundo: #0f0a03; --t-card-a: #281b0b; --t-card-b: #35240e;
+  --t-texto: #ffffff; --t-suave: #f0dfc3; --t-borda: #66502e;
+  --t-input: #f3e5ce; --t-input-texto: #1c1408;
+  --t-destaque: #ffc857; --t-destaque-2: #ff9f1c; --t-btn-texto: #1c1408;
+  --t-destaque-fraco: rgba(255, 200, 87, .16);
+  --t-vidro: rgba(255, 255, 255, .07); --t-erro: #ff9999;
+}
+
+html[data-tema="claro"] {
+  --t-fundo: #f4f6f5; --t-card-a: #ffffff; --t-card-b: #e9efec;
+  --t-texto: #17251f; --t-suave: #40534a; --t-borda: #bdccc4;
+  --t-input: #ffffff; --t-input-texto: #17251f;
+  --t-destaque: #0b6e5b; --t-destaque-2: #12a37f; --t-btn-texto: #ffffff;
+  --t-destaque-fraco: rgba(11, 110, 91, .12);
+  --t-vidro: rgba(0, 0, 0, .035); --t-erro: #c62828;
+}
+
+/* Páginas públicas (/agendar) seguem o tema */
+html[data-tema] {
+  --fundo: var(--t-fundo); --papel: var(--t-card-a); --tinta: var(--t-texto); --suave: var(--t-suave);
+  --linha: var(--t-borda); --marca: var(--t-destaque); --marca-escura: var(--t-destaque-2);
+  --destaque: var(--t-destaque); --erro: var(--t-erro); --ok: var(--t-destaque);
+  --campo: var(--t-input); --on-marca: var(--t-btn-texto);
+  --aviso-fundo: color-mix(in srgb, var(--t-destaque) 12%, transparent);
+  --erro-fundo: color-mix(in srgb, var(--t-erro) 15%, transparent);
+}
+
+/* ===== CORREÇÃO DOS CAMPOS DE TEXTO ===== */
+html[data-tema] .narrow input,
+html[data-tema] .narrow textarea,
+html[data-tema] .narrow select {
+  background: var(--t-card-b) !important;
+  color: var(--t-texto) !important;
+  border: 1px solid var(--t-borda) !important;
+  opacity: 1 !important;
+}
+
+html[data-tema] .narrow input::placeholder,
+html[data-tema] .narrow textarea::placeholder {
+  color: var(--t-suave) !important;
+  opacity: 1 !important;
+}
+
+html[data-tema] .narrow input:focus,
+html[data-tema] .narrow textarea:focus,
+html[data-tema] .narrow select:focus {
+  border-color: var(--t-destaque) !important;
+  outline: none;
+}

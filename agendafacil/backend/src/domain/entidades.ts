@@ -25,6 +25,7 @@ export interface Estabelecimento {
   tituloAgenda: string | null;
   /** URL da logo (só planos com logoPersonalizada). */
   logoUrl: string | null;
+  tema: string;
   createdAt: Date;
 }
 

@@ -1,9 +1,63 @@
 body {
-  background: #000;
-  color: #fff;
+  background: var(--t-fundo);
+  color: var(--t-texto);
 }
 
 /* cole aqui TODO o bloco "NAVEGAÇÃO DO TOPO (PainelShell)" (nav.nav, .marca, .marca-logo, a, button.sec, .sp e o @media) */
+
+/* =========================================
+   NAVEGAÇÃO DO TOPO (PainelShell)
+   ========================================= */
+
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  width: 100%;
+  box-sizing: border-box;
+  padding: .9rem 1.2rem;
+  background: var(--t-fundo);
+  border-bottom: 2px solid var(--t-destaque-2);
+  font-family: 'DM Sans', system-ui, sans-serif;
+}
+
+.nav .marca {
+  display: inline-flex;
+  align-items: center;
+  gap: .6rem;
+  margin-right: .6rem;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -.03em;
+  color: var(--t-destaque);
+}
+
+.nav .marca-logo {
+  height: 32px;
+  width: auto;
+  border-radius: 8px;
+}
+
+.nav a {
+  color: var(--t-texto);
+  font-size: .9rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color .2s;
+}
+
+.nav a:hover {
+  color: var(--t-destaque);
+}
+
+.nav a:focus-visible,
+.nav button:focus-visible {
+  outline: 3px solid var(--t-destaque);
+  outline-offset: 3px;
+}
+
 
 /* AVISOS DE ASSINATURA (PainelShell) */
 
@@ -12,21 +66,21 @@ main > .aviso {
   box-sizing: border-box;
   margin: 1rem auto 0;
   padding: .7rem 1rem;
-  border: 1px solid #454545;
+  border: 1px solid var(--t-borda);
   border-radius: 9px;
-  background: rgba(255, 255, 255, .03);
-  color: #c4c4c4;
+  background: var(--t-vidro);
+  color: var(--t-suave);
   font-family: 'DM Sans', system-ui, sans-serif;
   font-size: .9rem;
 }
 
 main > .aviso.grave {
   border-color: #8b3434;
-  color: #ff9b94;
+  color: var(--t-erro);
 }
 
 main > .aviso a {
-  color: #d6ff72;
+  color: var(--t-destaque);
   font-weight: 700;
 }
 
@@ -34,8 +88,8 @@ main > .aviso a.btn {
   display: inline-flex;
   margin-left: .5rem;
   padding: 6px 12px;
-  background: linear-gradient(90deg, #86e05a, #d6ff72);
-  color: #000;
+  background: linear-gradient(90deg, var(--t-destaque-2), var(--t-destaque));
+  color: var(--t-btn-texto);
   border-radius: 12px;
   text-decoration: none;
 }

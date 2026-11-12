@@ -22,6 +22,7 @@ export class ObterPaginaPublicaUseCase {
       slug: est.slug,
       fusoHorario: est.fusoHorario,
       tituloAgenda: est.tituloAgenda,
+      tema: est.tema,
       logoUrl: POLITICA_PLANOS[est.plano].logoPersonalizada ? est.logoUrl : null,
       catalogoPublico: exibeCatalogo,
       servicos: servicos.map((s) =>

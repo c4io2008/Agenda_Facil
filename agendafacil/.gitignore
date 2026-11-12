@@ -1,0 +1,29 @@
+# Dependências (baixadas com npm install)
+node_modules/
+
+# Builds
+dist/
+build/
+.next/
+out/
+.swc/
+*.tsbuildinfo
+next-env.d.ts
+
+# Variáveis de ambiente (mantém só os .env.example)
+.env
+.env.*
+!.env.example
+
+# Testes
+coverage/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Sistema / editores
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

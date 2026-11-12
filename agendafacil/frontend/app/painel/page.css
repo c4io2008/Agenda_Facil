@@ -1,0 +1,675 @@
+
+/* =========================================
+   PAINEL AGENDA - AGENDAFÁCIL
+   ========================================= */
+
+.painel-agenda {
+  --lima: #d6ff72;
+  --verde: #86e05a;
+  --grafite: #222222;
+  --grafite-claro: #292929;
+
+  width: min(100% - 2rem, 800px);
+  margin: 0 auto;
+  padding: 1rem 0 3rem;
+  color: #fff;
+  font-family: 'DM Sans', system-ui, sans-serif;
+}
+
+/* FUNDO */
+
+body {
+  background: #000;
+  color: #fff;
+}
+
+/* =========================================
+   TÍTULO
+   ========================================= */
+
+.painel-agenda .agenda-titulo {
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(2rem, 4vw, 2.6rem);
+  font-weight: 800;
+  letter-spacing: -.04em;
+  color: var(--lima);
+  margin: 0 0 .5rem;
+}
+
+/* =========================================
+   CARDS
+   ========================================= */
+
+.painel-agenda .card {
+  background: linear-gradient(145deg, #292929, #202020);
+  border: 1px solid rgba(255, 255, 255, .035);
+  border-radius: 13px;
+  padding: 1rem;
+  margin-bottom: .75rem;
+  color: #fff;
+  box-sizing: border-box;
+}
+
+/* =========================================
+   LINK DE AGENDAMENTO
+   ========================================= */
+
+.painel-agenda .link-card {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 1.2rem;
+  margin-bottom: .7rem;
+  font-size: .9rem;
+}
+
+.painel-agenda .link-info {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.painel-agenda .link-card strong {
+  display: inline-block;
+  margin-top: .25rem;
+  font-size: .95rem;
+}
+
+.painel-agenda .link-acoes {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* =========================================
+   MÉTRICAS
+   ========================================= */
+
+.painel-agenda .metricas {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: .75rem;
+  margin-bottom: .7rem;
+}
+
+.painel-agenda .metrica-card {
+  margin: 0;
+  min-height: 72px;
+  padding: .85rem .75rem;
+  font-size: .9rem;
+}
+
+.painel-agenda .metrica-card strong {
+  display: inline-block;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: .15rem;
+}
+
+/* =========================================
+   FILTROS - DE / ATÉ / PROFISSIONAL
+   ========================================= */
+
+.painel-agenda .filtros-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: end;
+  gap: 16px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 20px 12px;
+  margin-bottom: .7rem;
+}
+
+.painel-agenda .filtros-grid > div {
+  min-width: 0;
+  width: 100%;
+}
+
+.painel-agenda .filtros-grid label {
+  display: block;
+  margin: 0 0 7px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* =========================================
+   INPUTS E SELECTS
+   ========================================= */
+
+.painel-agenda input:not([type="checkbox"]),
+.painel-agenda select {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  height: 39px;
+  padding: .55rem .8rem;
+  background: #c9d1db;
+  color: #111;
+  border: 0;
+  border-radius: 9px;
+  font-family: inherit;
+  font-size: .9rem;
+}
+
+.painel-agenda input:focus-visible,
+.painel-agenda select:focus-visible {
+  outline: 2px solid var(--lima);
+  outline-offset: 2px;
+}
+
+/* =========================================
+   AGENDAMENTOS
+   ========================================= */
+
+.painel-agenda .agendamento-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: .9rem 1rem;
+  margin-bottom: .7rem;
+  font-size: .9rem;
+}
+
+.painel-agenda .agendamento-card strong {
+  font-weight: 700;
+}
+
+.painel-agenda .tag {
+  display: inline-block;
+  padding: .15rem .55rem;
+  border-radius: 20px;
+  background: #c9d1db;
+  color: #222;
+  font-size: .75rem;
+  font-weight: 600;
+}
+
+.painel-agenda .tag.falha {
+  background: #8b3434;
+  color: #fff;
+}
+
+/* =========================================
+   FORMULÁRIOS
+   ========================================= */
+
+.painel-agenda .formularios-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .75rem;
+  margin-top: 1.5rem;
+}
+
+.painel-agenda .formulario-card {
+  margin: 0;
+  padding: 1rem;
+  min-width: 0;
+}
+
+.painel-agenda .formulario-card h2,
+.painel-agenda .servicos-section h2 {
+  font-family: 'Poppins', sans-serif;
+  color: var(--lima);
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: -.04em;
+  margin: 0 0 .35rem;
+}
+
+.painel-agenda .formulario-card label {
+  display: block;
+  font-size: .9rem;
+  font-weight: 600;
+  margin: .45rem 0 .35rem;
+}
+
+.painel-agenda .formulario-card input:not([type="checkbox"]) {
+  margin-bottom: .1rem;
+}
+
+/* =========================================
+   CHECKBOXES E FIELDSETS
+   ========================================= */
+
+.painel-agenda fieldset {
+  border: 1px solid #454545;
+  padding: .6rem .75rem;
+  margin: .55rem 0;
+  min-width: 0;
+}
+
+.painel-agenda fieldset legend {
+  font-size: .85rem;
+  padding: 0 .2rem;
+}
+
+.painel-agenda fieldset label {
+  display: inline-block;
+  margin: .25rem .4rem .25rem 0;
+  font-size: .85rem;
+  font-weight: 500;
+}
+
+.painel-agenda input[type="checkbox"] {
+  accent-color: var(--lima);
+  cursor: pointer;
+}
+
+/* =========================================
+   BOTÕES PRINCIPAIS
+   ========================================= */
+
+.painel-agenda .btn,
+.painel-agenda .formulario-card button:not(.sec) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  min-width: 0;
+  min-height: 38px;
+  padding: 9px 17px;
+
+  background: linear-gradient(
+    90deg,
+    var(--verde),
+    var(--lima)
+  );
+
+  color: #000;
+  border: none;
+  border-radius: 12px;
+
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+
+  text-decoration: none;
+  cursor: pointer;
+
+  transition: filter .2s, transform .2s;
+}
+
+/* ABRIR PÁGINA DO CLIENTE */
+
+.painel-agenda .link-acoes .btn {
+  min-height: 40px;
+  padding: 10px 14px;
+  white-space: nowrap;
+}
+
+/* =========================================
+   BOTÕES SECUNDÁRIOS
+   ========================================= */
+
+.painel-agenda button.sec {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 38px;
+  padding: 9px 14px;
+
+  background: transparent;
+  color: var(--lima);
+
+  border: 1.5px solid var(--lima);
+  border-radius: 12px;
+
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+  transition: background .2s, transform .2s;
+}
+
+/* COPIAR LINK */
+
+.painel-agenda .link-acoes button.sec {
+  min-height: 40px;
+  white-space: nowrap;
+}
+
+/* HOVER DOS BOTÕES */
+
+.painel-agenda .btn:hover,
+.painel-agenda button:not(.sec):hover {
+  filter: brightness(1.08);
+}
+
+.painel-agenda button.sec:hover {
+  background: rgba(214, 255, 114, .10);
+}
+
+.painel-agenda button:active,
+.painel-agenda .btn:active {
+  transform: scale(.97);
+}
+
+/* =========================================
+   ALINHAMENTO DOS BOTÕES DOS FORMULÁRIOS
+   ========================================= */
+
+/* SALVAR SERVIÇO: ESQUERDA */
+
+.painel-agenda .formularios-grid > form:first-child > p {
+  text-align: left;
+  margin: 10px 0 0;
+}
+
+/* SALVAR PROFISSIONAL: DIREITA */
+
+.painel-agenda .formularios-grid > form:nth-child(2) > p {
+  text-align: right;
+  margin: 10px 0 0;
+}
+
+/* =========================================
+   MEUS SERVIÇOS
+   ========================================= */
+
+.painel-agenda .servicos-section {
+  margin-top: 1.5rem;
+}
+
+.painel-agenda .servicos-section h2 {
+  margin-bottom: .75rem;
+}
+
+.painel-agenda .servico-card {
+  padding: 1rem;
+  margin-bottom: .7rem;
+}
+
+.painel-agenda .servico-card .linha {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.painel-agenda .servico-card img {
+  max-width: 120px;
+  border-radius: 8px;
+  margin-top: 6px;
+}
+
+/* =========================================
+   MENSAGENS
+   ========================================= */
+
+.painel-agenda .erro {
+  color: #ff9b94;
+  font-weight: 600;
+  margin: .7rem 0;
+}
+
+.painel-agenda .ok {
+  color: var(--lima);
+  font-weight: 600;
+}
+
+.painel-agenda small {
+  color: #c4c4c4;
+}
+
+/* =========================================
+   ACESSIBILIDADE
+   ========================================= */
+
+.painel-agenda button:focus-visible,
+.painel-agenda a:focus-visible {
+  outline: 3px solid var(--lima);
+  outline-offset: 3px;
+}
+
+/* =========================================
+   RESPONSIVIDADE - TABLETS E CELULARES
+   ========================================= */
+
+@media (max-width: 650px) {
+
+  .painel-agenda {
+    width: min(100% - 1.2rem, 800px);
+    padding-top: .8rem;
+  }
+
+  /* LINK */
+
+  .painel-agenda .link-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .painel-agenda .link-acoes {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .painel-agenda .link-acoes > * {
+    flex: 1;
+  }
+
+  /* MÉTRICAS */
+
+  .painel-agenda .metricas {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: .4rem;
+  }
+
+  .painel-agenda .metrica-card {
+    padding: .7rem .4rem;
+    font-size: .72rem;
+  }
+
+  .painel-agenda .metrica-card strong {
+    font-size: 1.1rem;
+  }
+
+  /* FILTROS */
+
+  .painel-agenda .filtros-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  /* FORMULÁRIOS */
+
+  .painel-agenda .formularios-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .painel-agenda .formulario-card h2 {
+    font-size: 1.35rem;
+  }
+
+  /* AGENDAMENTOS */
+
+  .painel-agenda .agendamento-card {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  /* SERVIÇOS */
+
+  .painel-agenda .servico-card .linha {
+    flex-wrap: wrap;
+  }
+}
+
+/* ===== CABEÇALHO DO PAINEL ===== */
+
+.painel-agenda {
+  width: 100%;
+}
+
+.painel-agenda > .agenda-titulo {
+  width: 100%;
+  margin: 0 0 1.5rem;
+  color: #d6ff72;
+  font-size: 2rem;
+  font-weight: 800;
+}
+/* ===== MÉTRICAS ===== */
+
+.metricas {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.2rem;
+  margin: 1.5rem 0;
+}
+
+.metrica-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 125px;
+  gap: 8px;
+}
+
+.metrica-card strong {
+  display: block;
+  font-size: 2.3rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.metrica-card span {
+  display: block;
+  text-align: center;
+}
+
+/* ===== BOTÃO SALVAR PROFISSIONAL ===== */
+
+.profissional-acoes {
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+  margin-top: 1.5rem;
+}
+
+.profissional-acoes button {
+  margin-left: 0;
+}
+
+/* ===== RESPONSIVIDADE ===== */
+
+@media (max-width: 600px) {
+  .metricas {
+    grid-template-columns: 1fr;
+    gap: .8rem;
+  }
+
+  .metrica-card {
+    min-height: 100px;
+  }
+
+  .painel-agenda > .agenda-titulo {
+    font-size: 1.7rem;
+  }
+}
+/* =========================================
+   NAVEGAÇÃO DO TOPO (PainelShell)
+   ========================================= */
+
+nav.nav {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  width: 100%;
+  box-sizing: border-box;
+  padding: .9rem 1.2rem;
+  background: #000;
+  border-bottom: 2px solid #86e05a;
+  font-family: 'DM Sans', system-ui, sans-serif;
+}
+
+nav.nav .marca {
+  display: inline-flex;
+  align-items: center;
+  gap: .6rem;
+  margin-right: .6rem;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -.03em;
+  color: #d6ff72;
+}
+
+nav.nav .marca-logo {
+  height: 32px;
+  width: auto;
+  border-radius: 8px;
+}
+
+nav.nav a {
+  color: #fff;
+  font-size: .9rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color .2s;
+}
+
+nav.nav a:hover {
+  color: #d6ff72;
+}
+
+nav.nav a:focus-visible,
+nav.nav button:focus-visible {
+  outline: 3px solid #d6ff72;
+  outline-offset: 3px;
+}
+
+/* SAIR */
+nav.nav button.sec {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 9px 14px;
+  background: transparent;
+  color: #d6ff72;
+  border: 1.5px solid #d6ff72;
+  border-radius: 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .2s, transform .2s;
+}
+
+nav.nav button.sec:hover {
+  background: rgba(214, 255, 114, .10);
+}
+
+nav.nav button.sec:active {
+  transform: scale(.97);
+}
+
+nav.nav .sp {
+  margin-left: auto;
+}
+
+@media (max-width: 650px) {
+  nav.nav {
+    flex-wrap: wrap;
+    gap: .8rem 1rem;
+    padding: .8rem .9rem;
+  }
+
+  nav.nav .marca {
+    flex-basis: 100%;
+  }
+}

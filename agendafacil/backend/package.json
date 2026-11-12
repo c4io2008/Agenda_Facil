@@ -1,0 +1,44 @@
+{
+  "name": "agendafacil-backend",
+  "version": "1.0.0",
+  "private": true,
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/server.js",
+    "test": "jest --runInBand",
+    "prisma:generate": "prisma generate",
+    "seed:plataforma": "tsx prisma/seed.ts",
+    "test:unit": "jest --config jest.unit.config.js"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "express-rate-limit": "^7.4.1",
+    "jsonwebtoken": "^9.0.2",
+    "luxon": "^3.5.0",
+    "node-cron": "^3.0.3",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.14",
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/luxon": "^3.4.2",
+    "@types/node": "^20.16.0",
+    "@types/node-cron": "^3.0.11",
+    "@types/supertest": "^6.0.2",
+    "jest": "^29.7.0",
+    "prisma": "^5.22.0",
+    "supertest": "^7.0.0",
+    "ts-jest": "^29.2.5",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.3"
+  }
+}

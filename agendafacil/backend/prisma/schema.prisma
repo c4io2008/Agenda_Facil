@@ -1,0 +1,244 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Plano {
+  BASICO
+  PROFISSIONAL
+  PREMIUM
+}
+
+enum StatusEstabelecimento {
+  ATIVO
+  SUSPENSO
+  CANCELADO
+}
+
+enum StatusAgendamento {
+  CONFIRMADO
+  CANCELADO
+}
+
+enum StatusAssinatura {
+  ATIVA
+  EM_ATRASO
+  SUSPENSA
+  CANCELADA
+}
+
+enum StatusCobranca {
+  PENDENTE
+  PAGA
+  FALHA
+}
+
+enum TipoNotificacao {
+  CONFIRMACAO
+  LEMBRETE
+  CANCELAMENTO
+}
+
+enum StatusNotificacao {
+  PENDENTE
+  ENVIADA
+  FALHA
+}
+
+enum PapelPlataforma {
+  ADMIN
+  SUPORTE
+}
+
+model Estabelecimento {
+  id                    String                @id @default(uuid()) @db.Uuid
+  nome                  String                @db.VarChar(150)
+  slug                  String                @unique @db.VarChar(160)
+  cnpjCpf               String                @unique @map("cnpj_cpf") @db.VarChar(18)
+  email                 String                @unique @db.VarChar(255)
+  telefone              String?               @db.VarChar(20)
+  senhaHash             String                @map("senha_hash") @db.VarChar(255)
+  catalogoPublico       Boolean               @default(false) @map("catalogo_publico")
+  plano                 Plano                 @default(BASICO)
+  status                StatusEstabelecimento @default(ATIVO)
+  fusoHorario           String                @default("America/Maceio") @map("fuso_horario") @db.VarChar(50)
+  intervaloGradeMinutos Int                   @default(30) @map("intervalo_grade_minutos")
+  tituloAgenda          String?               @map("titulo_agenda") @db.VarChar(60)
+  logoUrl               String?               @map("logo_url") @db.VarChar(255)
+  createdAt             DateTime              @default(now()) @map("created_at") @db.Timestamptz
+
+  horariosFuncionamento HorarioFuncionamento[]
+  profissionais         Profissional[]
+  servicos              Servico[]
+  agendamentos          Agendamento[]
+  assinatura            Assinatura?
+
+  @@map("estabelecimentos")
+}
+
+// abre/fecha/inicio/fim em "HH:mm" (VarChar(5)) no lugar de TIME, evitando fuso implícito.
+model HorarioFuncionamento {
+  id                String          @id @default(uuid()) @db.Uuid
+  estabelecimentoId String          @map("estabelecimento_id") @db.Uuid
+  diaSemana         Int             @map("dia_semana") @db.SmallInt
+  abre              String          @db.VarChar(5)
+  fecha             String          @db.VarChar(5)
+  estabelecimento   Estabelecimento @relation(fields: [estabelecimentoId], references: [id], onDelete: Cascade)
+
+  @@map("horarios_funcionamento")
+}
+
+model Profissional {
+  id                String   @id @default(uuid()) @db.Uuid
+  estabelecimentoId String   @map("estabelecimento_id") @db.Uuid
+  nome              String   @db.VarChar(150)
+  ativo             Boolean  @default(true)
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  estabelecimento     Estabelecimento       @relation(fields: [estabelecimentoId], references: [id], onDelete: Cascade)
+  horariosAtendimento HorarioAtendimento[]
+  servicos            ProfissionalServico[]
+  agendamentos        Agendamento[]
+
+  @@map("profissionais")
+}
+
+model HorarioAtendimento {
+  id             String       @id @default(uuid()) @db.Uuid
+  profissionalId String       @map("profissional_id") @db.Uuid
+  diaSemana      Int          @map("dia_semana") @db.SmallInt
+  inicio         String       @db.VarChar(5)
+  fim            String       @db.VarChar(5)
+  profissional   Profissional @relation(fields: [profissionalId], references: [id], onDelete: Cascade)
+
+  @@map("horarios_atendimento")
+}
+
+model Servico {
+  id                String   @id @default(uuid()) @db.Uuid
+  estabelecimentoId String   @map("estabelecimento_id") @db.Uuid
+  nome              String   @db.VarChar(100)
+  preco             Decimal  @db.Decimal(8, 2)
+  duracaoMinutos    Int      @map("duracao_minutos")
+  fotoUrl           String?  @map("foto_url") @db.VarChar(255)
+  ativo             Boolean  @default(true)
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  estabelecimento Estabelecimento       @relation(fields: [estabelecimentoId], references: [id], onDelete: Cascade)
+  profissionais   ProfissionalServico[]
+  agendamentos    Agendamento[]
+
+  @@map("servicos")
+}
+
+model ProfissionalServico {
+  profissionalId String       @map("profissional_id") @db.Uuid
+  servicoId      String       @map("servico_id") @db.Uuid
+  profissional   Profissional @relation(fields: [profissionalId], references: [id], onDelete: Cascade)
+  servico        Servico      @relation(fields: [servicoId], references: [id], onDelete: Cascade)
+
+  @@id([profissionalId, servicoId])
+  @@map("profissionais_servicos")
+}
+
+model Agendamento {
+  id                String            @id @default(uuid()) @db.Uuid
+  codigo            String            @unique @db.VarChar(12)
+  estabelecimentoId String            @map("estabelecimento_id") @db.Uuid
+  profissionalId    String            @map("profissional_id") @db.Uuid
+  servicoId         String            @map("servico_id") @db.Uuid
+  nomeCliente       String            @map("nome_cliente") @db.VarChar(150)
+  whatsappCliente   String            @map("whatsapp_cliente") @db.VarChar(20)
+  dataHora          DateTime          @map("data_hora") @db.Timestamptz
+  status            StatusAgendamento @default(CONFIRMADO)
+  createdAt         DateTime          @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt         DateTime          @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  estabelecimento Estabelecimento       @relation(fields: [estabelecimentoId], references: [id], onDelete: Cascade)
+  profissional    Profissional          @relation(fields: [profissionalId], references: [id], onDelete: Restrict)
+  servico         Servico               @relation(fields: [servicoId], references: [id], onDelete: Restrict)
+  notificacoes    NotificacaoWhatsapp[]
+
+  @@index([profissionalId, dataHora], map: "idx_agendamentos_profissional_data")
+  @@index([estabelecimentoId, dataHora], map: "idx_agendamentos_estab_data")
+  @@map("agendamentos")
+}
+
+model Assinatura {
+  id                   String           @id @default(uuid()) @db.Uuid
+  estabelecimentoId    String           @unique @map("estabelecimento_id") @db.Uuid
+  plano                Plano
+  valorMensal          Decimal          @map("valor_mensal") @db.Decimal(8, 2)
+  status               StatusAssinatura @default(ATIVA)
+  planoAgendado        Plano?           @map("plano_agendado")
+  // Extra à especificação: marca o cancelamento "ao fim do ciclo" (RN-17).
+  cancelarNoFimDoCiclo Boolean          @default(false) @map("cancelar_no_fim_do_ciclo")
+  inicio               DateTime         @db.Date
+  proximaCobranca      DateTime?        @map("proxima_cobranca") @db.Date
+  createdAt            DateTime         @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt            DateTime         @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  estabelecimento Estabelecimento @relation(fields: [estabelecimentoId], references: [id], onDelete: Cascade)
+  cobrancas       Cobranca[]
+
+  @@map("assinaturas")
+}
+
+model Cobranca {
+  id                String         @id @default(uuid()) @db.Uuid
+  assinaturaId      String         @map("assinatura_id") @db.Uuid
+  valor             Decimal        @db.Decimal(8, 2)
+  vencimento        DateTime       @db.Date
+  status            StatusCobranca @default(PENDENTE)
+  pagoEm            DateTime?      @map("pago_em") @db.Timestamptz
+  referenciaExterna String?        @map("referencia_externa") @db.VarChar(100)
+  createdAt         DateTime       @default(now()) @map("created_at") @db.Timestamptz
+
+  assinatura Assinatura @relation(fields: [assinaturaId], references: [id], onDelete: Cascade)
+
+  @@map("cobrancas")
+}
+
+model NotificacaoWhatsapp {
+  id            String            @id @default(uuid()) @db.Uuid
+  agendamentoId String            @map("agendamento_id") @db.Uuid
+  tipo          TipoNotificacao
+  status        StatusNotificacao @default(PENDENTE)
+  tentativas    Int               @default(0)
+  ultimoErro    String?           @map("ultimo_erro") @db.VarChar(255)
+  agendadaPara  DateTime          @map("agendada_para") @db.Timestamptz
+  enviadaEm     DateTime?         @map("enviada_em") @db.Timestamptz
+  createdAt     DateTime          @default(now()) @map("created_at") @db.Timestamptz
+
+  agendamento Agendamento @relation(fields: [agendamentoId], references: [id], onDelete: Cascade)
+
+  @@index([status, agendadaPara])
+  @@map("notificacoes_whatsapp")
+}
+
+model UsuarioPlataforma {
+  id        String          @id @default(uuid()) @db.Uuid
+  nome      String          @db.VarChar(150)
+  email     String          @unique @db.VarChar(255)
+  senhaHash String          @map("senha_hash") @db.VarChar(255)
+  papel     PapelPlataforma @default(SUPORTE)
+  createdAt DateTime        @default(now()) @map("created_at") @db.Timestamptz
+
+  @@map("usuarios_plataforma")
+}
+
+// Log de auditoria do backoffice: quem, quando, o quê (RF14).
+model AuditoriaPlataforma {
+  id                String   @id @default(uuid()) @db.Uuid
+  usuarioId         String   @map("usuario_id") @db.Uuid
+  acao              String   @db.VarChar(60)
+  estabelecimentoId String?  @map("estabelecimento_id") @db.Uuid
+  detalhe           String?  @db.VarChar(255)
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@map("auditoria_plataforma")
+}

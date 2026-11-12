@@ -1,0 +1,203 @@
+/* =========================================
+   CONFIGURAÇÕES - AGENDAFÁCIL
+   ========================================= */
+
+.painel-config {
+  --lima: #d6ff72;
+  --verde: #86e05a;
+
+  width: min(100% - 2rem, 800px);
+  margin: 0 auto;
+  padding: 1rem 0 3rem;
+  color: #fff;
+  font-family: 'DM Sans', system-ui, sans-serif;
+}
+
+body {
+  background: #000;
+  color: #fff;
+}
+
+/* TÍTULO */
+
+.painel-config .agenda-titulo {
+  width: 100%;
+  margin: 0 0 1.5rem;
+  font-family: 'Poppins', sans-serif;
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -.04em;
+  color: var(--lima);
+}
+
+/* CARDS */
+
+.painel-config .card {
+  background: linear-gradient(145deg, #292929, #202020);
+  border: 1px solid rgba(255, 255, 255, .035);
+  border-radius: 13px;
+  padding: 1.2rem;
+  margin-bottom: .75rem;
+  color: #fff;
+  box-sizing: border-box;
+}
+
+.painel-config .card h2 {
+  font-family: 'Poppins', sans-serif;
+  color: var(--lima);
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: -.04em;
+  margin: 0 0 .6rem;
+}
+
+/* LABELS */
+
+.painel-config label {
+  display: block;
+  font-size: .9rem;
+  font-weight: 600;
+  margin: .6rem 0 .35rem;
+}
+
+/* INPUTS */
+
+.painel-config input:not([type="checkbox"]) {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  height: 39px;
+  padding: .55rem .8rem;
+  background: #c9d1db;
+  color: #111;
+  border: 0;
+  border-radius: 9px;
+  font-family: inherit;
+  font-size: .9rem;
+}
+
+.painel-config input::placeholder {
+  color: #6b7280;
+}
+
+.painel-config input:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+.painel-config input:focus-visible {
+  outline: 2px solid var(--lima);
+  outline-offset: 2px;
+}
+
+.painel-config input[type="checkbox"] {
+  accent-color: var(--lima);
+  cursor: pointer;
+}
+
+/* MENSAGENS */
+
+.painel-config .ok {
+  color: var(--lima);
+  font-weight: 600;
+  margin: .7rem 0;
+}
+
+.painel-config .erro {
+  color: #ff9b94;
+  font-weight: 600;
+  margin: .7rem 0;
+}
+
+.painel-config small {
+  color: #c4c4c4;
+}
+
+/* AVISO DE PLANO */
+
+.painel-config .aviso {
+  margin: .6rem 0;
+  padding: .6rem .8rem;
+  border: 1px solid #454545;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, .03);
+  color: #c4c4c4;
+  font-size: .85rem;
+}
+
+.painel-config .aviso a {
+  color: var(--lima);
+  font-weight: 700;
+}
+
+/* HORÁRIO DE FUNCIONAMENTO */
+
+.painel-config .linha {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+}
+
+.painel-config .linha label {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+}
+
+.painel-config .linha input[type="time"] {
+  min-width: 110px;
+}
+
+/* BOTÕES */
+
+.painel-config form > p {
+  margin: 1rem 0 0;
+}
+
+.painel-config button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 9px 17px;
+  background: linear-gradient(90deg, var(--verde), var(--lima));
+  color: #000;
+  border: none;
+  border-radius: 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter .2s, transform .2s;
+}
+
+.painel-config button:hover {
+  filter: brightness(1.08);
+}
+
+.painel-config button:active {
+  transform: scale(.97);
+}
+
+.painel-config button:focus-visible,
+.painel-config a:focus-visible {
+  outline: 3px solid var(--lima);
+  outline-offset: 3px;
+}
+
+/* RESPONSIVIDADE */
+
+@media (max-width: 650px) {
+  .painel-config {
+    width: min(100% - 1.2rem, 800px);
+    padding-top: .8rem;
+  }
+
+  .painel-config .agenda-titulo {
+    font-size: 1.7rem;
+  }
+
+  .painel-config .linha {
+    flex-wrap: wrap;
+  }
+}

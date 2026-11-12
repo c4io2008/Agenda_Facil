@@ -1,0 +1,41 @@
+body {
+  background: #000;
+  color: #fff;
+}
+
+/* cole aqui TODO o bloco "NAVEGAÇÃO DO TOPO (PainelShell)" (nav.nav, .marca, .marca-logo, a, button.sec, .sp e o @media) */
+
+/* AVISOS DE ASSINATURA (PainelShell) */
+
+main > .aviso {
+  width: min(100% - 2rem, 800px);
+  box-sizing: border-box;
+  margin: 1rem auto 0;
+  padding: .7rem 1rem;
+  border: 1px solid #454545;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, .03);
+  color: #c4c4c4;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: .9rem;
+}
+
+main > .aviso.grave {
+  border-color: #8b3434;
+  color: #ff9b94;
+}
+
+main > .aviso a {
+  color: #d6ff72;
+  font-weight: 700;
+}
+
+main > .aviso a.btn {
+  display: inline-flex;
+  margin-left: .5rem;
+  padding: 6px 12px;
+  background: linear-gradient(90deg, #86e05a, #d6ff72);
+  color: #000;
+  border-radius: 12px;
+  text-decoration: none;
+}

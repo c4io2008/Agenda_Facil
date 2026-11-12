@@ -1,0 +1,180 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Poppins:wght@400;600;700;800&display=swap');
+
+.lp {
+  --lima: #d6ff72;
+  --carvao: #2a2a2a;
+  position: fixed;
+  inset: 0;
+  overflow-y: auto;
+  background: #000;
+  color: #fff;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+}
+.lp-slide {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  scroll-snap-align: start;
+  display: flex;
+  overflow: hidden;
+}
+
+/* ---------- Slide 1: Automatize seu negócio ---------- */
+.lp-hero { align-items: center; }
+.lp-hero-texto {
+  flex: 1 1 50%;
+  padding: 0 clamp(1.5rem, 8vw, 9rem);
+  z-index: 1;
+}
+.lp-hero h1 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 800;
+  font-size: clamp(2.2rem, 4.6vw, 4rem);
+  line-height: 1.15;
+  letter-spacing: -.01em;
+  color: var(--lima);
+  text-decoration: underline;
+  text-decoration-thickness: .08em;
+  text-underline-offset: .12em;
+  max-width: 10ch;
+  margin: 0;
+}
+.lp-hero-marca {
+  position: relative;
+  flex: 1 1 50%;
+  align-self: stretch;
+  min-width: 0;
+}
+.lp-estrela {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  height: 135%;
+  aspect-ratio: 1;
+  transform: translate(-30%, -50%); /* corta o lado direito, como no layout */
+  fill: var(--lima);
+}
+.lp-logo {
+  position: absolute;
+  top: 50%;
+  left: 58%;
+  transform: translateY(-50%);
+  color: #000;
+  line-height: .95;
+  white-space: nowrap;
+  z-index: 1;
+}
+.lp-logo .agenda { display: block; font-family: 'Poppins', sans-serif; font-weight: 300; font-size: clamp(2.6rem, 6.4vw, 6.4rem); letter-spacing: -.02em; }
+.lp-logo .facil { display: inline-flex; align-items: flex-end; gap: .15em; font-family: 'Poppins', sans-serif; font-weight: 800; font-size: clamp(2.6rem, 6.4vw, 6.4rem); letter-spacing: -.02em; }
+.lp-logo svg { width: .62em; height: .62em; margin-bottom: .08em; stroke: #000; fill: none; stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; }
+
+.lp-descer {
+  position: absolute;
+  left: 50%;
+  bottom: 1.5rem;
+  transform: translateX(-50%);
+  z-index: 2;
+  width: 3rem; height: 3rem;
+  border-radius: 50%;
+  border: 2px solid var(--lima);
+  background: transparent;
+  color: var(--lima);
+  font-size: 1.4rem;
+  cursor: pointer;
+  display: grid; place-items: center;
+  animation: lp-pulo 1.0s ease-in-out infinite;
+  line-height: 1;
+  text-indent: -3px;
+  padding-bottom: 7px;
+}
+.lp-descer:hover { background: var(--lima); color: #000; }
+@keyframes lp-pulo { 50% { transform: translate(-50%, 6px); } }
+
+/* ---------- Slide 2: Planos ---------- */
+.lp-planos {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem 5rem;
+  gap: 2.5rem;
+}
+.lp-planos h2 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: clamp(2rem, 4.4vw, 3.6rem);
+  color: var(--lima);
+  margin: 0;
+  letter-spacing: -.02em;
+}
+.lp-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(1rem, 3vw, 2.5rem);
+  width: min(100%, 1060px);
+}
+.lp-card {
+  background: var(--carvao);
+  border-radius: 14px;
+  padding: 2rem 1.25rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-height: 24rem;
+}
+.lp-card h3 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 800;
+  font-size: clamp(1.4rem, 2.4vw, 2.1rem);
+  text-transform: uppercase;
+  letter-spacing: -.01em;
+  margin: 0;
+  color: #f5f5f5;
+}
+.lp-card hr { width: 8.5rem; height: 0; border: 0; border-top: 1px solid var(--lima); background: none; margin: 1.25rem 0; }
+.lp-card .recursos { display: block; margin: auto 0; font-size: clamp(1.05rem, 1.8vw, 1.5rem); line-height: 1.3; }
+.lp-card .mais { color: var(--lima); }
+.lp-card .preco { font-size: clamp(1.05rem, 1.7vw, 1.5rem); font-weight: 400; margin: 1.5rem 0; } /* sobrescreve .preco global (negrito) */
+.lp-botao {
+  display: inline-block;
+  background: var(--lima);
+  color: #000;
+  border-radius: 999px;
+  padding: .55rem 1.25rem;
+  font-size: .9rem;
+  font-weight: 500;
+  text-decoration: none;
+  max-width: 11rem;
+  line-height: 1.2;
+}
+.lp-botao:hover { background: #fff; }
+.lp-entrar { position: absolute; left: 1.25rem; bottom: 1.25rem; margin: 0; font-size: .95rem; }
+.lp-entrar a { color: var(--lima); }
+.lp a:focus-visible, .lp button:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+
+/* ---------- Animação de entrada ---------- */
+.lp-revela { opacity: 0; transform: translateY(32px); transition: opacity .7s ease, transform .7s ease; }
+.lp-revela.visivel { opacity: 1; transform: none; }
+.lp-card.lp-revela:nth-child(2) { transition-delay: .12s; }
+.lp-card.lp-revela:nth-child(3) { transition-delay: .24s; }
+@media (prefers-reduced-motion: reduce) {
+  .lp { scroll-behavior: auto; }
+  .lp-revela { opacity: 1; transform: none; transition: none; }
+  .lp-descer { animation: none; }
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 800px) {
+  .lp { scroll-snap-type: y proximity; }
+  .lp-hero { flex-direction: column; justify-content: center; }
+  .lp-hero-texto { flex: 0 0 auto; padding: 4rem 1.5rem 0; width: 100%; }
+  .lp-hero h1 { max-width: none; }
+  .lp-hero-marca { flex: 0 0 18rem; width: 100%; }
+  .lp-estrela { height: 120%; transform: translate(-50%, -50%); }
+  .lp-logo { left: 50%; transform: translate(-50%, -50%); }
+  .lp-cards { grid-template-columns: 1fr; width: min(100%, 26rem); }
+  .lp-card { min-height: 0; }
+  .lp-entrar { position: static; }
+}

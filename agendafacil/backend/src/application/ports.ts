@@ -58,7 +58,7 @@ export interface NovoEstabelecimento {
 }
 
 export type DadosEstabelecimento = Partial<
-  Pick<Estabelecimento, 'nome' | 'slug' | 'telefone' | 'fusoHorario' | 'intervaloGradeMinutos' | 'catalogoPublico' | 'plano' | 'status' | 'tituloAgenda' | 'logoUrl' | 'tema'>
+  Pick<Estabelecimento, 'nome' | 'slug' | 'telefone' | 'fusoHorario' | 'intervaloGradeMinutos' | 'catalogoPublico' | 'plano' | 'status' | 'tituloAgenda' | 'mensagemCancelamento' | 'logoUrl' | 'tema'>
 >;
 
 export interface EstabelecimentoRepo {
@@ -103,6 +103,7 @@ export interface ServicoRepo {
   buscarPorId(estabelecimentoId: string, id: string): Promise<Servico | null>;
   listar(estabelecimentoId: string, apenasAtivos?: boolean): Promise<Servico[]>;
   contarPorIds(estabelecimentoId: string, ids: string[]): Promise<number>;
+  contarProfissionaisQueDependemDoServico(estabelecimentoId: string, id: string): Promise<number>;
   criar(estabelecimentoId: string, dados: DadosServico): Promise<Servico>;
   atualizar(estabelecimentoId: string, id: string, dados: Partial<DadosServico> & { ativo?: boolean }): Promise<Servico>;
   excluir(estabelecimentoId: string, id: string): Promise<void>;

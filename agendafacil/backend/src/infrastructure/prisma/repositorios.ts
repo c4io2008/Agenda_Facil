@@ -26,7 +26,7 @@ const toEst = (r: Prisma.EstabelecimentoGetPayload<object>): Estabelecimento => 
   id: r.id, nome: r.nome, slug: r.slug, cnpjCpf: r.cnpjCpf, email: r.email, telefone: r.telefone,
   senhaHash: r.senhaHash, catalogoPublico: r.catalogoPublico, plano: r.plano, status: r.status,
   fusoHorario: r.fusoHorario, intervaloGradeMinutos: r.intervaloGradeMinutos,
-  tituloAgenda: r.tituloAgenda, logoUrl: r.logoUrl, tema: r.tema, createdAt: r.createdAt,
+  tituloAgenda: r.tituloAgenda, mensagemCancelamento: r.mensagemCancelamento, logoUrl: r.logoUrl, tema: r.tema, createdAt: r.createdAt,
 });
 
 const incluirProf = { horariosAtendimento: true, servicos: true } as const;
@@ -210,6 +210,17 @@ class PrismaServicoRepo implements ServicoRepo {
   }
   contarPorIds(estabelecimentoId: string, ids: string[]) {
     return this.db.servico.count({ where: { estabelecimentoId, id: { in: ids } } });
+  }
+  contarProfissionaisQueDependemDoServico(estabelecimentoId: string, id: string) {
+    return this.db.profissional.count({
+      where: {
+        estabelecimentoId,
+        servicos: {
+          some: { servicoId: id },
+          none: { servicoId: { not: id } },
+        },
+      },
+    });
   }
   async criar(estabelecimentoId: string, d: DadosServico) {
     return toServ(await this.db.servico.create({ data: { estabelecimentoId, ...d } }));

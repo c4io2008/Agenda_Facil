@@ -673,3 +673,77 @@ nav.nav .sp {
     flex-basis: 100%;
   }
 }
+
+/* ===== AÇÕES DE REMOÇÃO DO CATÁLOGO ===== */
+.painel-agenda .acoes-catalogo {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  flex-wrap: wrap;
+}
+
+.painel-agenda button.sec.btn-remover {
+  color: #ff8f8f;
+  border-color: #d94b4b;
+}
+
+.painel-agenda button.sec.btn-remover:hover {
+  color: #ffffff;
+  background: #8b3434;
+}
+
+
+/* Horários individuais de cada dia no cadastro de profissional */
+.horarios-profissional {
+  display: grid;
+  gap: .75rem;
+}
+
+.dia-horario-profissional {
+  display: grid;
+  grid-template-columns: minmax(130px, .8fr) minmax(220px, 1.2fr);
+  align-items: center;
+  gap: .75rem;
+  padding: .65rem;
+  border: 1px solid var(--t-borda);
+  border-radius: 10px;
+}
+
+.dia-horario-profissional > label {
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+  flex-wrap: wrap;
+}
+
+.dia-horario-profissional small {
+  width: 100%;
+  color: var(--t-suave);
+  padding-left: 1.4rem;
+}
+
+.campos-horario-profissional {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .5rem;
+}
+
+.campos-horario-profissional label {
+  display: grid;
+  gap: .25rem;
+  margin: 0;
+}
+
+.campos-horario-profissional label span {
+  font-size: .8rem;
+}
+
+.aviso-horarios {
+  padding: .75rem;
+  border-radius: 8px;
+  background: var(--t-destaque-fraco);
+}
+
+@media (max-width: 560px) {
+  .dia-horario-profissional { grid-template-columns: 1fr; }
+}

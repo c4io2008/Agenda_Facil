@@ -4,6 +4,12 @@ import { exigirPainelEditavel } from '../contexto';
 import type { DadosProfissional, DadosServico, Relogio, UnitOfWork } from '../ports';
 
 function validarJanelas(janelas: JanelaHorario[], campo: string) {
+  if (janelas.length === 0) {
+    throw new ValidacaoDominioError('Selecione pelo menos um dia de atendimento.', [
+      { campo, mensagem: 'Selecione pelo menos um dia de atendimento.' },
+    ]);
+  }
+
   for (const j of janelas) {
     if (j.fim <= j.inicio) {
       throw new ValidacaoDominioError('O fim do horário deve ser depois do início.', [
@@ -45,6 +51,12 @@ export class GerenciarServicosUseCase {
     if ((await repos.servicos.contarAgendamentosFuturos(estabelecimentoId, id, this.relogio.agora())) > 0) {
       throw new PossuiAgendamentosFuturosError('serviço');
     }
+    if ((await repos.servicos.contarProfissionaisQueDependemDoServico(estabelecimentoId, id)) > 0) {
+      throw new ValidacaoDominioError(
+        'Não é possível remover este serviço porque há profissional que realiza somente ele. Associe outro serviço ao profissional primeiro.',
+        [{ campo: 'servico', mensagem: 'Associe outro serviço ao profissional antes de remover este serviço.' }],
+      );
+    }
     try {
       await repos.servicos.excluir(estabelecimentoId, id);
       return { desativado: false };
@@ -71,7 +83,14 @@ export class GerenciarProfissionaisUseCase {
 
   private async validarServicos(estabelecimentoId: string, ids: string[]) {
     const unicos = [...new Set(ids)];
-    if (unicos.length && (await this.uow.repos.servicos.contarPorIds(estabelecimentoId, unicos)) !== unicos.length) {
+
+    if (unicos.length === 0) {
+      throw new ValidacaoDominioError('Selecione pelo menos um serviço.', [
+        { campo: 'servicoIds', mensagem: 'Selecione pelo menos um serviço.' },
+      ]);
+    }
+
+    if ((await this.uow.repos.servicos.contarPorIds(estabelecimentoId, unicos)) !== unicos.length) {
       throw new ValidacaoDominioError('Um ou mais serviços não pertencem ao estabelecimento.', [
         { campo: 'servicoIds', mensagem: 'Serviço inválido.' },
       ]);

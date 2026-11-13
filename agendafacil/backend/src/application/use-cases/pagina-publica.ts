@@ -12,9 +12,10 @@ export class ObterPaginaPublicaUseCase {
     const { repos } = this.uow;
     const { est } = await carregarContextoPublico(repos, slug);
     const exibeCatalogo = est.catalogoPublico && POLITICA_PLANOS[est.plano].catalogoPublico;
-    const [servicos, profissionais] = await Promise.all([
+    const [servicos, profissionais, horariosFuncionamento] = await Promise.all([
       repos.servicos.listar(est.id, true),
       repos.profissionais.listar(est.id, true),
+      repos.estabelecimentos.listarHorariosFuncionamento(est.id),
     ]);
     return {
       id: est.id,
@@ -22,6 +23,8 @@ export class ObterPaginaPublicaUseCase {
       slug: est.slug,
       fusoHorario: est.fusoHorario,
       tituloAgenda: est.tituloAgenda,
+      mensagemCancelamento: est.mensagemCancelamento || 'Cancelamentos devem ser solicitados com pelo menos 2 dias de antecedência. Não é permitido cancelar no dia do agendamento.',
+      horariosFuncionamento,
       tema: est.tema,
       logoUrl: POLITICA_PLANOS[est.plano].logoPersonalizada ? est.logoUrl : null,
       catalogoPublico: exibeCatalogo,

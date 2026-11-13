@@ -19,6 +19,7 @@ interface Est {
   intervaloGradeMinutos: number;
   catalogoPublico: boolean;
   tituloAgenda: string | null;
+  mensagemCancelamento: string | null;
   logoUrl: string | null;
   tema: string;
   recursos: {
@@ -71,6 +72,7 @@ export default function Configuracoes() {
             nome: f.get('nome'),
             slug: f.get('slug'),
             tituloAgenda: String(f.get('titulo') ?? '').trim() || null,
+            mensagemCancelamento: String(f.get('mensagemCancelamento') ?? '').trim() || null,
             ...(est?.recursos.logoPersonalizada
               ? {
                   logoUrl: String(f.get('logo') ?? '').trim() || null,
@@ -122,6 +124,7 @@ export default function Configuracoes() {
         body: { horariosFuncionamento },
       });
 
+      setEst((atual) => atual ? { ...atual, horariosFuncionamento } : atual);
       setMsg('Horários salvos.');
     } catch (err) {
       setErro(mensagemDeErro(err));
@@ -176,7 +179,7 @@ export default function Configuracoes() {
               </p>
 
               <label htmlFor="t">
-                Nome da agenda (título do painel e da página do cliente)
+                Nome da agenda (título do painel)
               </label>
 
               <input
@@ -186,6 +189,17 @@ export default function Configuracoes() {
                 placeholder="Ex: Agenda da Barbearia Souza"
                 defaultValue={est.tituloAgenda ?? ''}
               />
+
+              <label htmlFor="mensagemCancelamento">Mensagem sobre cancelamentos (exibida ao cliente)</label>
+              <textarea
+                id="mensagemCancelamento"
+                name="mensagemCancelamento"
+                maxLength={500}
+                rows={4}
+                defaultValue={est.mensagemCancelamento ?? 'Cancelamentos devem ser solicitados com pelo menos 2 dias de antecedência. Não é permitido cancelar no dia do agendamento.'}
+                placeholder="Ex: Cancelamentos devem ser feitos com pelo menos 2 dias de antecedência."
+              />
+              <small>Essa mensagem será mostrada antes da confirmação do agendamento e na tela de confirmação.</small>
 
               <label htmlFor="lg">Logo (URL da imagem)</label>
 

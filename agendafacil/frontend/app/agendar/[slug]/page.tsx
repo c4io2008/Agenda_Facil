@@ -11,7 +11,8 @@ interface Pagina {
   nome: string;
   fusoHorario: string;
   catalogoPublico: boolean;
-  tituloAgenda: string | null;
+  mensagemCancelamento: string;
+  horariosFuncionamento: { diaSemana: number; inicio: string; fim: string }[];
   logoUrl: string | null;
   tema: string;
   servicos: {
@@ -39,6 +40,7 @@ export default function Agendar() {
   const [hora, setHora] = useState('');
   const [aviso, setAviso] = useState('');
   const [codigo, setCodigo] = useState('');
+  const DIAS_SEMANA = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
 
   useEffect(() => {
     api<Pagina>(`/estabelecimentos/${slug}`)
@@ -140,6 +142,7 @@ export default function Agendar() {
             Guarde o código: ele é a única forma de cancelar ou consultar o
             agendamento.
           </p>
+          <p className="aviso-cancelamento">{pag.mensagemCancelamento}</p>
         </div>
       </main>
     );
@@ -163,9 +166,21 @@ export default function Agendar() {
       )}
 
       <h1>{pag.nome}</h1>
-      <p className="pub-sub">
-        {pag.tituloAgenda || 'Agende seu horário'}
-      </p>
+      <p className="pub-sub">Agende seu horário</p>
+
+      {pag.horariosFuncionamento.length > 0 && (
+        <section className="card horarios-publicos">
+          <h2>Horário de funcionamento</h2>
+          {DIAS_SEMANA.map((dia, indice) => {
+            const janela = pag.horariosFuncionamento.find((h) => h.diaSemana === indice);
+            return (
+              <p key={dia}>
+                <strong>{dia}:</strong> {janela ? `${janela.inicio} às ${janela.fim}` : 'Fechado'}
+              </p>
+            );
+          })}
+        </section>
+      )}
 
       <h2>1. Escolha o serviço</h2>
 
@@ -269,6 +284,11 @@ export default function Agendar() {
           style={{ marginTop: '1rem' }}
         >
           <h2>4. Seus dados</h2>
+
+          <div className="card aviso-cancelamento" role="note">
+            <strong>Política de cancelamento</strong>
+            <p>{pag.mensagemCancelamento}</p>
+          </div>
 
           <label htmlFor="nome">Nome</label>
           <input

@@ -19,6 +19,7 @@ function paraDTO(e: Estabelecimento, horarios: JanelaHorario[]) {
     fusoHorario: e.fusoHorario,
     intervaloGradeMinutos: e.intervaloGradeMinutos,
     tituloAgenda: e.tituloAgenda,
+    mensagemCancelamento: e.mensagemCancelamento,
     logoUrl: e.logoUrl,
     tema: e.tema,
     recursos: { whatsapp: pol.whatsapp, catalogoPublico: pol.catalogoPublico, logoPersonalizada: pol.logoPersonalizada },

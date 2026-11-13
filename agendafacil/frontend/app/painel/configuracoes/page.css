@@ -80,6 +80,24 @@ body {
   color: #6b7280;
 }
 
+.painel-config textarea {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: .65rem .8rem;
+  background: var(--t-input);
+  color: var(--t-input-texto);
+  border: 0;
+  border-radius: 9px;
+  font: inherit;
+  resize: vertical;
+}
+
+.painel-config textarea:focus-visible {
+  outline: 2px solid var(--lima);
+  outline-offset: 2px;
+}
+
 .painel-config input:disabled {
   opacity: .5;
   cursor: not-allowed;

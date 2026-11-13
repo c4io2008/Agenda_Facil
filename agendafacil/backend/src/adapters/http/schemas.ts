@@ -62,6 +62,7 @@ export const estabelecimentoPatchSchema = z.object({
   intervaloGradeMinutos: z.number().int().min(5).max(120).optional(),
   catalogoPublico: z.boolean().optional(),
   tituloAgenda: z.string().trim().max(60).nullable().optional(),
+  mensagemCancelamento: z.string().trim().max(500).nullable().optional(),
   tema: z.enum(['lima', 'oceano', 'rosa', 'ambar', 'claro']).optional(),
   logoUrl: z
     .string()
@@ -84,16 +85,24 @@ const servicoBase = z.object({
 export const servicoSchema = servicoBase;
 export const servicoPatchSchema = servicoBase.partial().extend({ ativo: z.boolean().optional() });
 
+const servicoIdsProfissional = z.array(uuid)
+  .min(1, 'Selecione pelo menos um serviço.')
+  .max(100);
+
+const horariosProfissional = z.array(janela)
+  .min(1, 'Selecione pelo menos um dia de atendimento.')
+  .max(50);
+
 const profissionalBase = z.object({
   nome: z.string().trim().min(2).max(150),
-  servicoIds: z.array(uuid).max(100).default([]),
-  horariosAtendimento: z.array(janela).max(50).default([]),
+  servicoIds: servicoIdsProfissional,
+  horariosAtendimento: horariosProfissional,
 });
 export const profissionalSchema = profissionalBase;
 export const profissionalPatchSchema = z.object({
   nome: profissionalBase.shape.nome.optional(),
-  servicoIds: z.array(uuid).max(100).optional(),
-  horariosAtendimento: z.array(janela).max(50).optional(),
+  servicoIds: servicoIdsProfissional.optional(),
+  horariosAtendimento: horariosProfissional.optional(),
   ativo: z.boolean().optional(),
 });
 

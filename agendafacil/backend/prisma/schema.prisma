@@ -68,6 +68,7 @@ model Estabelecimento {
   fusoHorario           String                @default("America/Maceio") @map("fuso_horario") @db.VarChar(50)
   intervaloGradeMinutos Int                   @default(30) @map("intervalo_grade_minutos")
   tituloAgenda          String?               @map("titulo_agenda") @db.VarChar(60)
+  mensagemCancelamento  String?               @map("mensagem_cancelamento") @db.VarChar(500)
   logoUrl               String?               @map("logo_url") @db.VarChar(255)
   createdAt             DateTime              @default(now()) @map("created_at") @db.Timestamptz
   tema                  String                @default("lima") @db.VarChar(20)

@@ -120,3 +120,14 @@ html[data-tema] .narrow select:focus {
   border-color: var(--t-destaque) !important;
   outline: none;
 }
+
+.horarios-publicos h2 { margin-top: 0; }
+.horarios-publicos p { margin: .25rem 0; }
+.aviso-cancelamento {
+  padding: .85rem;
+  border: 1px solid var(--t-borda, var(--linha));
+  border-radius: 10px;
+  background: var(--t-destaque-fraco, var(--papel));
+  color: var(--t-texto, inherit);
+}
+.aviso-cancelamento p { margin-bottom: 0; }

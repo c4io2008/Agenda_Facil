@@ -31,9 +31,17 @@ interface Prof {
   id: string;
   nome: string;
   ativo: boolean;
+  servicoIds: string[];
+  horariosAtendimento: {
+    diaSemana: number;
+    inicio: string;
+    fim: string;
+  }[];
 }
 
-const DIAS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+const DIAS = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+
+interface JanelaFuncionamento { diaSemana: number; inicio: string; fim: string }
 
 export default function Painel() {
   const [ass, setAss] = useState<Assinatura | null>(null);
@@ -43,6 +51,7 @@ export default function Painel() {
   );
   const [slug, setSlug] = useState('');
   const [titulo, setTitulo] = useState('Agenda');
+  const [horariosFuncionamento, setHorariosFuncionamento] = useState<JanelaFuncionamento[]>([]);
   const [copiado, setCopiado] = useState(false);
   const [profFiltro, setProfFiltro] = useState('');
   const [itens, setItens] = useState<Item[]>([]);
@@ -86,13 +95,14 @@ export default function Painel() {
   }, [carregar]);
 
   useEffect(() => {
-    api<{ slug: string; tituloAgenda: string | null }>(
+    api<{ slug: string; tituloAgenda: string | null; horariosFuncionamento: JanelaFuncionamento[] }>(
       '/estabelecimentos/me',
       { auth: 'contratante' }
     )
       .then((e) => {
         setSlug(e.slug);
         setTitulo(e.tituloAgenda || 'Agenda');
+        setHorariosFuncionamento(e.horariosFuncionamento ?? []);
       })
       .catch(() => { });
   }, []);
@@ -177,7 +187,18 @@ export default function Painel() {
 
     const f = new FormData(e.currentTarget);
     const form = e.currentTarget;
+    const servicoIds = f.getAll('servicos').map(String);
     const dias = f.getAll('dias').map(Number);
+
+    if (servicoIds.length === 0) {
+      setErro('Selecione pelo menos um serviço para o profissional.');
+      return;
+    }
+
+    if (dias.length === 0) {
+      setErro('Selecione pelo menos um dia de atendimento.');
+      return;
+    }
 
     try {
       await api('/profissionais', {
@@ -185,17 +206,60 @@ export default function Painel() {
         auth: 'contratante',
         body: {
           nome: f.get('nome'),
-          servicoIds: f.getAll('servicos'),
+          servicoIds,
           horariosAtendimento: dias.map((d) => ({
             diaSemana: d,
-            inicio: f.get('inicio'),
-            fim: f.get('fim'),
+            inicio: String(f.get(`inicio-${d}`) ?? ''),
+            fim: String(f.get(`fim-${d}`) ?? ''),
           })),
         },
       });
 
       form.reset();
       await carregar();
+    } catch (err) {
+      setErro(mensagemDeErro(err));
+    }
+  }
+
+  async function excluirServico(id: string, nome: string) {
+    if (!confirm(`Deseja remover o serviço "${nome}"?`)) return;
+
+    try {
+      const resultado = await api<{ desativado: boolean }>(`/servicos/${id}`, {
+        method: 'DELETE',
+        auth: 'contratante',
+      });
+
+      setEditando(null);
+      await carregar();
+
+      setErro(
+        resultado.desativado
+          ? `O serviço "${nome}" foi desativado porque possui histórico de agendamentos.`
+          : `O serviço "${nome}" foi removido.`
+      );
+    } catch (err) {
+      setErro(mensagemDeErro(err));
+    }
+  }
+
+  async function excluirProfissional(id: string, nome: string) {
+    if (!confirm(`Deseja remover o profissional "${nome}"?`)) return;
+
+    try {
+      const resultado = await api<{ desativado: boolean }>(`/profissionais/${id}`, {
+        method: 'DELETE',
+        auth: 'contratante',
+      });
+
+      await carregar();
+
+      setErro(
+        resultado.desativado
+          ? `O profissional "${nome}" foi desativado porque possui histórico de agendamentos.`
+          : `O profissional "${nome}" foi removido.`
+      );
     } catch (err) {
       setErro(mensagemDeErro(err));
     }
@@ -411,7 +475,7 @@ export default function Painel() {
               <input id="pn" name="nome" required minLength={2} />
 
               <fieldset>
-                <legend>Serviços que realiza</legend>
+                <legend>Serviços que realiza (obrigatório)</legend>
 
                 {servicos.filter((s) => s.ativo).map((s) => (
                   <label key={s.id}>
@@ -426,42 +490,59 @@ export default function Painel() {
                 ))}
               </fieldset>
 
-              <fieldset>
-                <legend>Dias de atendimento</legend>
+              <fieldset className="horarios-profissional">
+                <legend>Dias e horários de atendimento (obrigatório)</legend>
+                {horariosFuncionamento.length === 0 && (
+                  <p className="aviso-horarios">
+                    Primeiro configure os horários da empresa em <a href="/painel/configuracoes">Configurações</a>.
+                  </p>
+                )}
 
-                {DIAS.map((d, n) => (
-                  <label
-                    key={d}
-                    style={{ display: 'inline-block', marginRight: 8 }}
-                  >
-                    <input
-                      type="checkbox"
-                      name="dias"
-                      value={n}
-                      style={{ width: 'auto' }}
-                    />
-                    {' '}{d}
-                  </label>
-                ))}
+                {DIAS.map((d, n) => {
+                  const funcionamento = horariosFuncionamento.find((h) => h.diaSemana === n);
+                  return (
+                    <div key={d} className="dia-horario-profissional">
+                      <label>
+                        <input
+                          type="checkbox"
+                          name="dias"
+                          value={n}
+                          disabled={!funcionamento}
+                          style={{ width: 'auto' }}
+                        />{' '}
+                        <strong>{d}</strong>
+                        {!funcionamento && <small>Empresa fechada</small>}
+                      </label>
+                      {funcionamento && (
+                        <div className="campos-horario-profissional">
+                          <label>
+                            <span>Início</span>
+                            <input
+                              type="time"
+                              name={`inicio-${n}`}
+                              min={funcionamento.inicio}
+                              max={funcionamento.fim}
+                              defaultValue={funcionamento.inicio}
+                              required
+                            />
+                          </label>
+                          <label>
+                            <span>Fim</span>
+                            <input
+                              type="time"
+                              name={`fim-${n}`}
+                              min={funcionamento.inicio}
+                              max={funcionamento.fim}
+                              defaultValue={funcionamento.fim}
+                              required
+                            />
+                          </label>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </fieldset>
-
-              <label htmlFor="pi">Início</label>
-              <input
-                id="pi"
-                name="inicio"
-                type="time"
-                defaultValue="09:00"
-                required
-              />
-
-              <label htmlFor="pfim">Fim</label>
-              <input
-                id="pfim"
-                name="fim"
-                type="time"
-                defaultValue="18:00"
-                required
-              />
 
               <div className="profissional-acoes">
                 <button type="submit">Salvar profissional</button>
@@ -560,17 +641,71 @@ export default function Painel() {
                       )}
                     </div>
 
-                    <button
-                      type="button"
-                      className="sec"
-                      onClick={() => setEditando(s.id)}
-                    >
-                      Editar
-                    </button>
+                    <div className="acoes-catalogo">
+                      <button
+                        type="button"
+                        className="sec"
+                        onClick={() => setEditando(s.id)}
+                      >
+                        Editar
+                      </button>
+                      <button
+                        type="button"
+                        className="sec btn-remover"
+                        onClick={() => excluirServico(s.id, s.nome)}
+                      >
+                        Remover
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
             ))}
+          </div>
+        )}
+
+        {/* MEUS PROFISSIONAIS */}
+        {!somenteLeitura && profs.some((p) => p.ativo) && (
+          <div className="servicos-section">
+            <h2>Meus profissionais</h2>
+
+            {profs.filter((p) => p.ativo).map((p) => {
+              const nomesServicos = p.servicoIds
+                .map((id) => servicos.find((s) => s.id === id)?.nome)
+                .filter((nome): nome is string => Boolean(nome));
+
+              const dias = [...new Set(
+                p.horariosAtendimento.map((h) => h.diaSemana)
+              )]
+                .sort((a, b) => a - b)
+                .map((dia) => DIAS[dia]);
+
+              return (
+                <div key={p.id} className="card servico-card">
+                  <div className="linha">
+                    <div>
+                      <strong>{p.nome}</strong>
+                      <br />
+                      <small>
+                        Serviços: {nomesServicos.join(', ') || 'Nenhum serviço'}
+                      </small>
+                      <br />
+                      <small>
+                        Dias: {dias.join(', ') || 'Nenhum dia configurado'}
+                      </small>
+                    </div>
+
+                    <button
+                      type="button"
+                      className="sec btn-remover"
+                      onClick={() => excluirProfissional(p.id, p.nome)}
+                    >
+                      Remover
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
 

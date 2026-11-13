@@ -23,6 +23,8 @@ export interface Estabelecimento {
   intervaloGradeMinutos: number;
   /** Título exibido no painel e na página pública (opcional). */
   tituloAgenda: string | null;
+  /** Mensagem de política de cancelamento exibida ao cliente. */
+  mensagemCancelamento: string | null;
   /** URL da logo (só planos com logoPersonalizada). */
   logoUrl: string | null;
   tema: string;

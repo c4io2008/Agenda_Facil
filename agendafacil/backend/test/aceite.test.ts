@@ -157,6 +157,17 @@ describe('Cenário 7: catálogo bloqueado fora do PREMIUM', () => {
 describe('Personalização (nome da agenda e logo)', () => {
   const LOGO = 'https://exemplo.com/logo.png';
 
+  it('ajuste da logo: padrão centralizado, salva posição/zoom e rejeita fora da faixa', async () => {
+    const t = await criarTenant(a, { plano: 'PROFISSIONAL' });
+    const me = await request(a.app).get('/api/v1/estabelecimentos/me').set(bearer(t)).expect(200);
+    expect(me.body).toMatchObject({ logoPosX: 50, logoPosY: 50, logoZoom: 100 });
+    await request(a.app).patch('/api/v1/estabelecimentos/me').set(bearer(t)).send({ logoPosX: 20, logoPosY: 70, logoZoom: 150 }).expect(200);
+    const pub = await request(a.app).get(`/api/v1/estabelecimentos/${t.slug}`).expect(200);
+    expect(pub.body).toMatchObject({ logoPosX: 20, logoPosY: 70, logoZoom: 150 });
+    await request(a.app).patch('/api/v1/estabelecimentos/me').set(bearer(t)).send({ logoZoom: 50 }).expect(422);
+    await request(a.app).patch('/api/v1/estabelecimentos/me').set(bearer(t)).send({ logoPosX: 101 }).expect(422);
+  });
+
   it('PROFISSIONAL salva título e logo; a página pública expõe os dois', async () => {
     const t = await criarTenant(a, { plano: 'PROFISSIONAL' });
     const r = await request(a.app).patch('/api/v1/estabelecimentos/me').set(bearer(t)).send({ tituloAgenda: 'Agenda do Souza', logoUrl: LOGO });

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import Carregando from '@/components/Carregando';
 import NavPublica from '@/components/NavPublica';
 import { api } from '@/lib/api';
 import { lerCodigos } from '@/lib/meus-agendamentos';
@@ -60,7 +61,7 @@ export default function MeusAgendamentos() {
           <button className="ag-btn">Buscar</button>
         </form>
 
-        {itens === null && <p>Carregando…</p>}
+        {itens === null && <Carregando compacto />}
         {itens?.length === 0 && <p>Nenhum agendamento salvo neste aparelho. Se você tem um código, digite acima.</p>}
         {itens?.map((a) => (
           <article key={a.codigo} className="ag-item">

@@ -70,6 +70,9 @@ model Estabelecimento {
   tituloAgenda          String?               @map("titulo_agenda") @db.VarChar(60)
   mensagemCancelamento  String?               @map("mensagem_cancelamento") @db.VarChar(500)
   logoUrl               String?               @map("logo_url") @db.VarChar(255)
+  logoPosX              Int                   @default(50) @map("logo_pos_x")
+  logoPosY              Int                   @default(50) @map("logo_pos_y")
+  logoZoom              Int                   @default(100) @map("logo_zoom")
   createdAt             DateTime              @default(now()) @map("created_at") @db.Timestamptz
   tema                  String                @default("lima") @db.VarChar(20)
   horariosFuncionamento HorarioFuncionamento[]

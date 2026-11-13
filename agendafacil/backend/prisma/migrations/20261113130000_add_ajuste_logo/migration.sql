@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "estabelecimentos" ADD COLUMN     "logo_pos_x" INTEGER NOT NULL DEFAULT 50,
+ADD COLUMN     "logo_pos_y" INTEGER NOT NULL DEFAULT 50,
+ADD COLUMN     "logo_zoom" INTEGER NOT NULL DEFAULT 100;

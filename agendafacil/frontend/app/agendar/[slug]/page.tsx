@@ -3,6 +3,7 @@
 import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Calendario from '@/components/Calendario';
+import Carregando from '@/components/Carregando';
 import NavPublica from '@/components/NavPublica';
 import TelaCodigo from '@/components/TelaCodigo';
 import { api, ApiError, brl, hoje, localParaUTC, mensagemDeErro } from '@/lib/api';
@@ -185,11 +186,7 @@ export default function Agendar() {
     );
   }
   if (!pag) {
-    return (
-      <div className="ag">
-        <p style={{ padding: '2rem' }}>Carregando…</p>
-      </div>
-    );
+    return <Carregando />;
   }
 
   if (codigo) {

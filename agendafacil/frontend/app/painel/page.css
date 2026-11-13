@@ -887,3 +887,21 @@ nav.nav .sp {
   flex-wrap: wrap;
   gap: 8px;
 }
+
+/* Paginação da lista de agendamentos */
+.painel-agenda .paginacao {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem 1rem;
+  flex-wrap: wrap;
+  margin: 1rem 0 1.5rem;
+}
+.painel-agenda .paginacao-info { font-size: .9rem; color: var(--t-suave); }
+.painel-agenda .paginacao-botoes { display: flex; align-items: center; gap: .4rem; flex-wrap: wrap; }
+.painel-agenda .paginacao-item { display: inline-flex; align-items: center; gap: .4rem; }
+.painel-agenda .paginacao-reticencias { color: var(--t-suave); }
+.painel-agenda .paginacao button.sec { padding: .45rem .9rem; font-size: .9rem; }
+.painel-agenda .paginacao button.sec:disabled { opacity: .4; cursor: not-allowed; }
+.painel-agenda .paginacao button.pagina-num { min-width: 2.4rem; padding: .45rem .5rem; }
+.painel-agenda .paginacao button.pagina-num.ativa { background: var(--t-destaque); color: var(--t-btn-texto, #000); border-color: var(--t-destaque); }

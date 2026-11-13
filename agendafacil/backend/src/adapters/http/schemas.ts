@@ -64,6 +64,9 @@ export const estabelecimentoPatchSchema = z.object({
   tituloAgenda: z.string().trim().max(60).nullable().optional(),
   mensagemCancelamento: z.string().trim().max(500).nullable().optional(),
   tema: z.enum(['lima', 'oceano', 'rosa', 'ambar', 'claro']).optional(),
+  logoPosX: z.number().int().min(0).max(100).optional(),
+  logoPosY: z.number().int().min(0).max(100).optional(),
+  logoZoom: z.number().int().min(100).max(300).optional(),
   logoUrl: z
     .string()
     .trim()

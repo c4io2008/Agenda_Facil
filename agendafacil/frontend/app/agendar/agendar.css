@@ -60,7 +60,7 @@ html:has(.ag) { scroll-behavior: smooth; scroll-padding-top: 4.5rem; }
   border-bottom: 3px solid var(--ag-a);
 }
 .ag-marca { display: inline-flex; align-items: center; gap: .6rem; color: var(--ag-a); font-size: 1.15rem; }
-.ag-marca img { width: 40px; height: 40px; flex-shrink: 0; object-fit: cover; border-radius: 50%; } /* logo sempre redonda */
+.ag-marca .logo-redonda { width: 40px; height: 40px; } /* logo sempre redonda (ver LogoRedonda) */
 .ag-nav nav { display: flex; gap: clamp(1rem, 3vw, 2.25rem); flex-wrap: wrap; }
 .ag-nav nav a { color: var(--ag-texto); text-decoration: none; font-size: 1.1rem; }
 .ag-nav nav a[aria-current='page'] { color: var(--ag-a); }
@@ -340,7 +340,23 @@ html:has(.ag) { scroll-behavior: smooth; scroll-padding-top: 4.5rem; }
   .ag-nota { margin-left: .5rem; }
   .ag-hero { padding-bottom: 6rem; }
 }
+/* ---------- Carregando (spinner) ---------- */
+.ag-carregando { display: grid; place-items: center; }
+.ag-carregando-fixo { position: fixed; inset: 0; z-index: 100; }
+.ag-spinner-area { display: grid; place-items: center; padding: 2rem; }
+.ag-spinner {
+  width: 3.2rem;
+  height: 3.2rem;
+  border: 4px solid var(--ag-card);
+  border-top-color: var(--ag-a);
+  border-right-color: var(--ag-b);
+  border-radius: 50%;
+  animation: ag-gira .8s linear infinite;
+}
+@keyframes ag-gira { to { transform: rotate(360deg); } }
+
 @media (prefers-reduced-motion: reduce) {
+  .ag-spinner { animation-duration: 2s; } /* spinner continua girando, só mais devagar */
   html:has(.ag) { scroll-behavior: auto; }
   .ag-descer { animation: none; }
 }

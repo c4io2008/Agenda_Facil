@@ -27,6 +27,9 @@ export class ObterPaginaPublicaUseCase {
       horariosFuncionamento,
       tema: est.tema,
       logoUrl: POLITICA_PLANOS[est.plano].logoPersonalizada ? est.logoUrl : null,
+      logoPosX: est.logoPosX,
+      logoPosY: est.logoPosY,
+      logoZoom: est.logoZoom,
       catalogoPublico: exibeCatalogo,
       whatsapp: POLITICA_PLANOS[est.plano].whatsapp,
       servicos: servicos.map((s) =>

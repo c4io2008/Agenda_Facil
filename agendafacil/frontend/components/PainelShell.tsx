@@ -2,6 +2,8 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import Carregando from '@/components/Carregando';
+import LogoRedonda from '@/components/LogoRedonda';
 import { api, tokens } from '@/lib/api';
 import { aplicarTema, limparTema, temaSalvo } from '@/lib/temas';
 import './PainelShell.css';
@@ -13,7 +15,7 @@ export interface Assinatura {
 }
 
 /** Navegação + banners de assinatura (EM_ATRASO / SUSPENSA = somente leitura). */
-export default function PainelShell({ children, onAssinatura }: { children: React.ReactNode; onAssinatura?: (a: Assinatura) => void }) {
+export default function PainelShell({ children, onAssinatura, carregando = false }: { children: React.ReactNode; onAssinatura?: (a: Assinatura) => void; carregando?: boolean }) {
   const router = useRouter();
   const [ass, setAss] = useState<Assinatura | null>(null);
   const [marca, setMarca] = useState<{ nome: string; logoUrl: string | null } | null>(null);
@@ -30,9 +32,10 @@ export default function PainelShell({ children, onAssinatura }: { children: Reac
 
   return (
     <>
+      {(!ass || carregando) && <Carregando sobreposto />}
       <nav className="nav" aria-label="Painel">
         <span className="marca">
-          {marca?.logoUrl && <img src={marca.logoUrl} alt="" className="marca-logo" onError={(e) => { e.currentTarget.style.display = 'none'; }} />}
+          {marca?.logoUrl && <LogoRedonda src={marca.logoUrl} className="marca-logo" />}
         </span>
         <Link href="/painel">Agenda</Link>
         <Link href="/painel/configuracoes">Configurações</Link>

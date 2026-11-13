@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+import LogoRedonda from '@/components/LogoRedonda';
 import '@/app/agendar/agendar.css';
 
 interface Props {
@@ -14,7 +15,7 @@ export default function NavPublica({ slug, nome, logoUrl, ativo }: Props) {
   return (
     <header className="ag-nav">
       <span className="ag-marca">
-        {logoUrl && <img src={logoUrl} alt="" onError={(e) => { e.currentTarget.style.display = 'none'; }} />}
+        {logoUrl && <LogoRedonda src={logoUrl} />}
         <strong>{nome}</strong>
       </span>
       <nav aria-label="Navegação">

@@ -9,7 +9,9 @@ docker compose up -d db                 # Postgres (cria também agendafacil_tes
 cd backend && cp .env.example .env && npm install
 npx prisma generate
 npx prisma migrate dev --name init      # cria a migration inicial
-SEED_ADMIN_EMAIL=voce@agendafacil.com SEED_ADMIN_SENHA='senha-forte' npm run seed:plataforma
+SEED_ADMIN_EMAIL=voce@agendafacil.com SEED_ADMIN_SENHA='senha-forte' npm run seed:plataforma 
+npx cross-env SEED_ADMIN_EMAIL=voce@agendafacil.com SEED_ADMIN_SENHA=senha-forte npm run seed:plataforma  
+$env:SEED_ADMIN_EMAIL="voce@agendafacil.com"; $env:SEED_ADMIN_SENHA="senha-forte"; npm run seed:plataforma
 npm run dev                             # API em :3333
 cd ../frontend && cp .env.example .env.local && npm install && npm run dev   # :3000
 ```

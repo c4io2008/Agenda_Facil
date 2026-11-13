@@ -40,6 +40,8 @@ interface Prof {
   }[];
 }
 
+const POR_PAGINA = 5; // agendamentos por página na lista da agenda
+
 const DIAS = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
 
 interface JanelaFuncionamento { diaSemana: number; inicio: string; fim: string }
@@ -64,6 +66,8 @@ export default function Painel() {
   const [servicos, setServicos] = useState<Servico[]>([]);
   const [profs, setProfs] = useState<Prof[]>([]);
   const [erro, setErro] = useState('');
+  const [pagina, setPagina] = useState(1);
+  const [carregado, setCarregado] = useState(false); // 1º carregamento da agenda (spinner)
   const [editando, setEditando] = useState<string | null>(null);
   const [servicosSelecionadosProf, setServicosSelecionadosProf] = useState<string[]>([]);
   const [servicosDropdownAberto, setServicosDropdownAberto] = useState(false);
@@ -96,12 +100,23 @@ export default function Painel() {
       setErro('');
     } catch (e) {
       setErro(mensagemDeErro(e));
+    } finally {
+      setCarregado(true);
     }
   }, [inicio, fim, profFiltro]);
 
   useEffect(() => {
     void carregar();
   }, [carregar]);
+
+  // Mudou o período ou o profissional: volta para a 1ª página.
+  useEffect(() => { setPagina(1); }, [inicio, fim, profFiltro]);
+
+  const totalPaginas = Math.max(1, Math.ceil(itens.length / POR_PAGINA));
+  const paginaAtual = Math.min(pagina, totalPaginas); // ex.: cancelou o último item da última página
+  const itensDaPagina = itens.slice((paginaAtual - 1) * POR_PAGINA, paginaAtual * POR_PAGINA);
+  const numerosPagina = Array.from({ length: totalPaginas }, (_, k) => k + 1)
+    .filter((n) => n === 1 || n === totalPaginas || Math.abs(n - paginaAtual) <= 1);
 
   useEffect(() => {
     api<{ slug: string; tituloAgenda: string | null; horariosFuncionamento: JanelaFuncionamento[] }>(
@@ -360,7 +375,7 @@ export default function Painel() {
   }
 
   return (
-    <PainelShell onAssinatura={setAss}>
+    <PainelShell onAssinatura={setAss} carregando={!carregado}>
       <div className="painel-agenda">
 
         <h1 className="agenda-titulo">{titulo}</h1>
@@ -465,7 +480,7 @@ export default function Painel() {
           </p>
         )}
 
-        {itens.map((i) => (
+        {itensDaPagina.map((i) => (
           <article key={i.codigo} className="card agendamento-card">
             <div>
               <strong>
@@ -507,6 +522,40 @@ export default function Painel() {
             )}
           </article>
         ))}
+
+        {/* PAGINAÇÃO */}
+        {totalPaginas > 1 && (
+          <nav className="paginacao" aria-label="Paginação dos agendamentos">
+            <span className="paginacao-info">
+              {(paginaAtual - 1) * POR_PAGINA + 1}–{Math.min(paginaAtual * POR_PAGINA, itens.length)} de {itens.length}
+            </span>
+
+            <div className="paginacao-botoes">
+              <button type="button" className="sec" disabled={paginaAtual === 1} onClick={() => setPagina(paginaAtual - 1)}>
+                Anterior
+              </button>
+
+              {numerosPagina.map((n, idx) => (
+                <span key={n} className="paginacao-item">
+                  {idx > 0 && n - numerosPagina[idx - 1] > 1 && <span className="paginacao-reticencias" aria-hidden="true">…</span>}
+                  <button
+                    type="button"
+                    className={`sec pagina-num${n === paginaAtual ? ' ativa' : ''}`}
+                    aria-label={`Página ${n}`}
+                    aria-current={n === paginaAtual ? 'page' : undefined}
+                    onClick={() => setPagina(n)}
+                  >
+                    {n}
+                  </button>
+                </span>
+              ))}
+
+              <button type="button" className="sec" disabled={paginaAtual === totalPaginas} onClick={() => setPagina(paginaAtual + 1)}>
+                Próxima
+              </button>
+            </div>
+          </nav>
+        )}
 
         {/* FORMULÁRIOS */}
         {!somenteLeitura && (

@@ -47,7 +47,6 @@ export default function Configuracoes() {
   const [est, setEst] = useState<Est | null>(null);
   const [msg, setMsg] = useState('');
   const [erro, setErro] = useState('');
-
   useEffect(() => {
     api<Est>('/estabelecimentos/me', { auth: 'contratante' })
       .then(setEst)
@@ -218,16 +217,6 @@ export default function Configuracoes() {
                   A logo personalizada está disponível nos planos
                   Profissional e Premium.{' '}
                   <a href="/painel/assinatura">Fazer upgrade</a>
-                </p>
-              )}
-
-              {est.logoUrl && (
-                <p>
-                  <img
-                    src={est.logoUrl}
-                    alt="Prévia da logo"
-                    style={{ maxHeight: 64, maxWidth: '100%' }}
-                  />
                 </p>
               )}
 

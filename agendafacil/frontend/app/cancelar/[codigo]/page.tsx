@@ -1,6 +1,7 @@
 'use client';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import Carregando from '@/components/Carregando';
 import TelaCodigo from '@/components/TelaCodigo';
 import { api, mensagemDeErro } from '@/lib/api';
 import { aplicarTema, limparTema } from '@/lib/temas';
@@ -40,9 +41,10 @@ export default function Cancelar() {
   }
 
   if (!ag) {
+    if (!erro) return <Carregando />;
     return (
       <div className="ag">
-        <main style={{ padding: '2rem' }}>{erro ? <p className="ag-erro" role="alert">{erro}</p> : <p>Carregando…</p>}</main>
+        <main style={{ padding: '2rem' }}><p className="ag-erro" role="alert">{erro}</p></main>
       </div>
     );
   }

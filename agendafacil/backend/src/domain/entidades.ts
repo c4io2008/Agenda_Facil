@@ -27,6 +27,10 @@ export interface Estabelecimento {
   mensagemCancelamento: string | null;
   /** URL da logo (só planos com logoPersonalizada). */
   logoUrl: string | null;
+  /** Ajuste da imagem dentro da logo redonda (RN-20): foco horizontal/vertical em % e zoom em %. */
+  logoPosX: number;
+  logoPosY: number;
+  logoZoom: number;
   tema: string;
   createdAt: Date;
 }

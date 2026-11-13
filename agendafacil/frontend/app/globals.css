@@ -131,3 +131,31 @@ html[data-tema] .narrow select:focus {
   color: var(--t-texto, inherit);
 }
 .aviso-cancelamento p { margin-bottom: 0; }
+
+/* Campo de WhatsApp com código do Brasil fixo na página de agendamento */
+.whatsapp-com-prefixo {
+  display: flex;
+  align-items: stretch;
+  gap: .5rem;
+}
+.whatsapp-com-prefixo > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 66px;
+  padding: .65rem .5rem;
+  border: 1px solid var(--linha);
+  border-radius: var(--raio);
+  background: var(--papel);
+  color: var(--tinta);
+  font-weight: 700;
+}
+.whatsapp-com-prefixo > input {
+  flex: 1;
+  min-width: 0;
+}
+html[data-tema] .whatsapp-com-prefixo > span {
+  background: var(--t-card-b);
+  color: var(--t-texto);
+  border-color: var(--t-borda);
+}

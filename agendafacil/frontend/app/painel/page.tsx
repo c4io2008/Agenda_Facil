@@ -64,6 +64,8 @@ export default function Painel() {
   const [profs, setProfs] = useState<Prof[]>([]);
   const [erro, setErro] = useState('');
   const [editando, setEditando] = useState<string | null>(null);
+  const [servicosSelecionadosProf, setServicosSelecionadosProf] = useState<string[]>([]);
+  const [servicosDropdownAberto, setServicosDropdownAberto] = useState(false);
 
   const somenteLeitura = ass
     ? ass.status === 'SUSPENSA' || ass.status === 'CANCELADA'
@@ -147,6 +149,7 @@ export default function Painel() {
       });
 
       form.reset();
+      setServicosSelecionadosProf([]);
       await carregar();
     } catch (err) {
       setErro(mensagemDeErro(err));
@@ -187,7 +190,7 @@ export default function Painel() {
 
     const f = new FormData(e.currentTarget);
     const form = e.currentTarget;
-    const servicoIds = f.getAll('servicos').map(String);
+    const servicoIds = servicosSelecionadosProf;
     const dias = f.getAll('dias').map(Number);
 
     if (servicoIds.length === 0) {
@@ -216,6 +219,8 @@ export default function Painel() {
       });
 
       form.reset();
+      setServicosSelecionadosProf([]);
+      setServicosDropdownAberto(false);
       await carregar();
     } catch (err) {
       setErro(mensagemDeErro(err));
@@ -474,20 +479,52 @@ export default function Painel() {
               <label htmlFor="pn">Nome</label>
               <input id="pn" name="nome" required minLength={2} />
 
-              <fieldset>
+              <fieldset className="servicos-profissional-fieldset">
                 <legend>Serviços que realiza (obrigatório)</legend>
-
-                {servicos.filter((s) => s.ativo).map((s) => (
-                  <label key={s.id}>
-                    <input
-                      type="checkbox"
-                      name="servicos"
-                      value={s.id}
-                      style={{ width: 'auto' }}
-                    />
-                    {' '}{s.nome}
-                  </label>
-                ))}
+                <div className="servicos-profissional-select">
+                  <button
+                    className="servicos-profissional-gatilho"
+                    type="button"
+                    aria-haspopup="listbox"
+                    aria-expanded={servicosDropdownAberto}
+                    onClick={() => setServicosDropdownAberto((aberto) => !aberto)}
+                  >
+                    <span className={servicosSelecionadosProf.length === 0 ? 'placeholder' : ''}>
+                      {servicosSelecionadosProf.length === 0
+                        ? 'Selecione os serviços'
+                        : servicos
+                            .filter((s) => servicosSelecionadosProf.includes(s.id))
+                            .map((s) => s.nome)
+                            .join(', ')}
+                    </span>
+                    <span className="servicos-profissional-seta" aria-hidden="true">⋮</span>
+                  </button>
+                  {servicosDropdownAberto && (
+                    <div className="servicos-profissional-opcoes" role="group" aria-label="Serviços disponíveis">
+                      {servicos.filter((s) => s.ativo).length === 0 ? (
+                        <p>Nenhum serviço cadastrado.</p>
+                      ) : servicos.filter((s) => s.ativo).map((s) => (
+                        <label key={s.id}>
+                          <input
+                            type="checkbox"
+                            checked={servicosSelecionadosProf.includes(s.id)}
+                            onChange={(e) => setServicosSelecionadosProf((atuais) =>
+                              e.target.checked
+                                ? [...atuais, s.id]
+                                : atuais.filter((id) => id !== s.id)
+                            )}
+                          />
+                          <span>{s.nome}</span>
+                        </label>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                {servicosSelecionadosProf.length > 0 && (
+                  <small className="servicos-profissional-contagem">
+                    {servicosSelecionadosProf.length} serviço(s) selecionado(s)
+                  </small>
+                )}
               </fieldset>
 
               <fieldset className="horarios-profissional">

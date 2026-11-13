@@ -40,6 +40,7 @@ export default function Agendar() {
   const [hora, setHora] = useState('');
   const [aviso, setAviso] = useState('');
   const [codigo, setCodigo] = useState('');
+  const [whatsapp, setWhatsapp] = useState('');
   const DIAS_SEMANA = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
 
   useEffect(() => {
@@ -94,7 +95,7 @@ export default function Agendar() {
           profissionalId: profId,
           servicoId,
           nomeCliente: f.get('nome'),
-          whatsappCliente: f.get('whatsapp'),
+          whatsappCliente: `+55${whatsapp.replace(/\D/g, '')}`, 
           dataHora,
         },
       });
@@ -299,16 +300,36 @@ export default function Agendar() {
             maxLength={150}
           />
 
-          <label htmlFor="whatsapp">
-            WhatsApp (ex: +5582999990000)
-          </label>
-          <input
-            id="whatsapp"
-            name="whatsapp"
-            required
-            pattern="\\+[1-9][0-9]{7,14}"
-            inputMode="tel"
-          />
+          <label htmlFor="whatsappNumero">WhatsApp</label>
+          <div className="whatsapp-com-prefixo">
+            <span aria-hidden="true">(+55)</span>
+            <input
+              id="whatsappNumero"
+              name="whatsappNumero"
+              type="tel"
+              required
+              inputMode="numeric"
+              autoComplete="tel-national"
+              placeholder="(82) 99999-0000"
+              value={whatsapp}
+              maxLength={15}
+              pattern="[0-9() \-]{10,15}"
+              title="Informe DDD e número de WhatsApp. O código +55 já está incluído."
+              onChange={(e) => {
+                const digits = e.target.value.replace(/\D/g, '').slice(0, 11);
+                let formatado = digits;
+                if (digits.length > 2) {
+                  formatado = `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+                }
+                if (digits.length > 7) {
+                  const ddd = digits.slice(0, 2);
+                  const numero = digits.slice(2);
+                  formatado = `(${ddd}) ${numero.slice(0, numero.length === 9 ? 5 : 4)}-${numero.slice(numero.length === 9 ? 5 : 4)}`;
+                }
+                setWhatsapp(formatado);
+              }}
+            />
+          </div>
 
           {aviso && (
             <p className="erro" role="alert">

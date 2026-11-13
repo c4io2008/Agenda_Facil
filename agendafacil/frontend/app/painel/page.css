@@ -853,3 +853,35 @@ nav.nav .sp {
 .painel-agenda .servicos-profissional-contagem {
   color: var(--t-suave);
 }
+
+
+/* Edição dos dados e horários de profissionais */
+.painel-agenda .editar-profissional-form {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--t-borda);
+}
+.painel-agenda .editar-profissional-form h3 {
+  margin: 0;
+  color: var(--t-destaque);
+}
+.painel-agenda .servicos-edicao-lista {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px 14px;
+}
+.painel-agenda .servicos-edicao-lista label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.painel-agenda .servicos-edicao-lista input[type="checkbox"] {
+  width: auto;
+}
+.painel-agenda .editar-profissional-form .profissional-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}

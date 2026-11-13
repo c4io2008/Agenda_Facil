@@ -66,6 +66,12 @@ export default function Painel() {
   const [editando, setEditando] = useState<string | null>(null);
   const [servicosSelecionadosProf, setServicosSelecionadosProf] = useState<string[]>([]);
   const [servicosDropdownAberto, setServicosDropdownAberto] = useState(false);
+  const [profissionalEmEdicao, setProfissionalEmEdicao] = useState<{
+    id: string;
+    nome: string;
+    servicoIds: string[];
+    horariosAtendimento: { diaSemana: number; inicio: string; fim: string }[];
+  } | null>(null);
 
   const somenteLeitura = ass
     ? ass.status === 'SUSPENSA' || ass.status === 'CANCELADA'
@@ -244,6 +250,87 @@ export default function Painel() {
           ? `O serviço "${nome}" foi desativado porque possui histórico de agendamentos.`
           : `O serviço "${nome}" foi removido.`
       );
+    } catch (err) {
+      setErro(mensagemDeErro(err));
+    }
+  }
+
+  function iniciarEdicaoProfissional(profissional: Prof) {
+    setErro('');
+    setProfissionalEmEdicao({
+      id: profissional.id,
+      nome: profissional.nome,
+      servicoIds: [...profissional.servicoIds],
+      horariosAtendimento: profissional.horariosAtendimento.map((h) => ({ ...h })),
+    });
+  }
+
+  function atualizarHorarioEdicao(diaSemana: number, campo: 'inicio' | 'fim', valor: string) {
+    setProfissionalEmEdicao((atual) => {
+      if (!atual) return atual;
+      return {
+        ...atual,
+        horariosAtendimento: atual.horariosAtendimento.map((h) =>
+          h.diaSemana === diaSemana ? { ...h, [campo]: valor } : h
+        ),
+      };
+    });
+  }
+
+  function alternarDiaEdicao(diaSemana: number, marcado: boolean) {
+    setProfissionalEmEdicao((atual) => {
+      if (!atual) return atual;
+      if (marcado) {
+        const funcionamento = horariosFuncionamento.find((h) => h.diaSemana === diaSemana);
+        if (!funcionamento) return atual;
+        return {
+          ...atual,
+          horariosAtendimento: [...atual.horariosAtendimento, {
+            diaSemana,
+            inicio: funcionamento.inicio,
+            fim: funcionamento.fim,
+          }].sort((a, b) => a.diaSemana - b.diaSemana),
+        };
+      }
+      return {
+        ...atual,
+        horariosAtendimento: atual.horariosAtendimento.filter((h) => h.diaSemana !== diaSemana),
+      };
+    });
+  }
+
+  async function salvarEdicaoProfissional() {
+    if (!profissionalEmEdicao) return;
+    if (!profissionalEmEdicao.nome.trim()) {
+      setErro('Informe o nome do profissional.');
+      return;
+    }
+    if (profissionalEmEdicao.servicoIds.length === 0) {
+      setErro('Selecione pelo menos um serviço para o profissional.');
+      return;
+    }
+    if (profissionalEmEdicao.horariosAtendimento.length === 0) {
+      setErro('Selecione pelo menos um dia de atendimento.');
+      return;
+    }
+    if (profissionalEmEdicao.horariosAtendimento.some((h) => h.fim <= h.inicio)) {
+      setErro('Em cada dia, o horário final deve ser depois do horário inicial.');
+      return;
+    }
+
+    try {
+      await api(`/profissionais/${profissionalEmEdicao.id}`, {
+        method: 'PATCH',
+        auth: 'contratante',
+        body: {
+          nome: profissionalEmEdicao.nome.trim(),
+          servicoIds: profissionalEmEdicao.servicoIds,
+          horariosAtendimento: profissionalEmEdicao.horariosAtendimento,
+        },
+      });
+      setProfissionalEmEdicao(null);
+      await carregar();
+      setErro('Profissional atualizado com sucesso.');
     } catch (err) {
       setErro(mensagemDeErro(err));
     }
@@ -732,14 +819,107 @@ export default function Painel() {
                       </small>
                     </div>
 
-                    <button
-                      type="button"
-                      className="sec btn-remover"
-                      onClick={() => excluirProfissional(p.id, p.nome)}
-                    >
-                      Remover
-                    </button>
+                    <div className="acoes-catalogo">
+                      <button
+                        type="button"
+                        className="sec"
+                        onClick={() => iniciarEdicaoProfissional(p)}
+                      >
+                        Editar
+                      </button>
+                      <button
+                        type="button"
+                        className="sec btn-remover"
+                        onClick={() => excluirProfissional(p.id, p.nome)}
+                      >
+                        Remover
+                      </button>
+                    </div>
                   </div>
+                  {profissionalEmEdicao?.id === p.id && (
+                    <div className="editar-profissional-form">
+                      <h3>Editar profissional</h3>
+                      <label htmlFor={`prof-nome-${p.id}`}>Nome</label>
+                      <input
+                        id={`prof-nome-${p.id}`}
+                        value={profissionalEmEdicao.nome}
+                        onChange={(e) => setProfissionalEmEdicao((atual) => atual ? { ...atual, nome: e.target.value } : atual)}
+                        required
+                      />
+
+                      <fieldset className="servicos-profissional-fieldset">
+                        <legend>Serviços que realiza (obrigatório)</legend>
+                        <div className="servicos-edicao-lista">
+                          {servicos.filter((s) => s.ativo).map((servico) => (
+                            <label key={servico.id}>
+                              <input
+                                type="checkbox"
+                                checked={profissionalEmEdicao.servicoIds.includes(servico.id)}
+                                onChange={(e) => setProfissionalEmEdicao((atual) => {
+                                  if (!atual) return atual;
+                                  return { ...atual, servicoIds: e.target.checked
+                                    ? [...atual.servicoIds, servico.id]
+                                    : atual.servicoIds.filter((id) => id !== servico.id) };
+                                })}
+                              />
+                              <span>{servico.nome}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </fieldset>
+
+                      <fieldset className="horarios-profissional">
+                        <legend>Dias e horários de atendimento (obrigatório)</legend>
+                        {DIAS.map((dia, diaSemana) => {
+                          const funcionamento = horariosFuncionamento.find((h) => h.diaSemana === diaSemana);
+                          const horario = profissionalEmEdicao.horariosAtendimento.find((h) => h.diaSemana === diaSemana);
+                          return (
+                            <div key={dia} className="dia-horario-profissional">
+                              <label>
+                                <input
+                                  type="checkbox"
+                                  checked={Boolean(horario)}
+                                  disabled={!funcionamento}
+                                  onChange={(e) => alternarDiaEdicao(diaSemana, e.target.checked)}
+                                  style={{ width: 'auto' }}
+                                />{' '}
+                                <strong>{dia}</strong>
+                                {!funcionamento && <small>Empresa fechada</small>}
+                              </label>
+                              {horario && (
+                                <div className="campos-horario-profissional">
+                                  <label>
+                                    <span>Início</span>
+                                    <input
+                                      type="time"
+                                      value={horario.inicio}
+                                      min={funcionamento?.inicio}
+                                      max={funcionamento?.fim}
+                                      onChange={(e) => atualizarHorarioEdicao(diaSemana, 'inicio', e.target.value)}
+                                    />
+                                  </label>
+                                  <label>
+                                    <span>Fim</span>
+                                    <input
+                                      type="time"
+                                      value={horario.fim}
+                                      min={funcionamento?.inicio}
+                                      max={funcionamento?.fim}
+                                      onChange={(e) => atualizarHorarioEdicao(diaSemana, 'fim', e.target.value)}
+                                    />
+                                  </label>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </fieldset>
+                      <div className="profissional-acoes">
+                        <button type="button" onClick={salvarEdicaoProfissional}>Salvar alterações</button>
+                        <button type="button" className="sec" onClick={() => setProfissionalEmEdicao(null)}>Cancelar</button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               );
             })}

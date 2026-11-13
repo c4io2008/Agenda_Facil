@@ -81,6 +81,7 @@ const servicoBase = z.object({
   preco: z.number().min(0).max(99999.99),
   duracaoMinutos: z.number().int().min(5).max(720),
   fotoUrl: z.string().url().max(255).nullish(),
+  descricao: z.string().trim().max(120, 'A descrição pode ter até 120 caracteres.').nullish(),
 });
 export const servicoSchema = servicoBase;
 export const servicoPatchSchema = servicoBase.partial().extend({ ativo: z.boolean().optional() });

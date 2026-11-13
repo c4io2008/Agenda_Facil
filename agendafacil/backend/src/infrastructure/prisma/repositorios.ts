@@ -43,7 +43,7 @@ const toProf = (r: Prisma.ProfissionalGetPayload<{ include: typeof incluirProf }
 
 const toServ = (r: Prisma.ServicoGetPayload<object>): Servico => ({
   id: r.id, estabelecimentoId: r.estabelecimentoId, nome: r.nome, preco: num(r.preco),
-  duracaoMinutos: r.duracaoMinutos, fotoUrl: r.fotoUrl, ativo: r.ativo,
+  duracaoMinutos: r.duracaoMinutos, fotoUrl: r.fotoUrl, descricao: r.descricao, ativo: r.ativo,
 });
 
 const toAg = (r: Prisma.AgendamentoGetPayload<object>): Agendamento => ({

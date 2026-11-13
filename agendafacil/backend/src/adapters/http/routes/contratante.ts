@@ -28,7 +28,7 @@ export function rotasContratante(c: Container): Router {
     res.json({ itens: await u.servicos.listar(est(req)) });
   }));
   r.post('/servicos', auth, validar({ body: servicoSchema }), h(async (req, res) => {
-    res.status(201).json(await u.servicos.criar(est(req), { ...req.body, fotoUrl: req.body.fotoUrl ?? null }));
+    res.status(201).json(await u.servicos.criar(est(req), { ...req.body, fotoUrl: req.body.fotoUrl ?? null, descricao: req.body.descricao || null }));
   }));
   r.get('/servicos/:id', auth, validar({ params: idParams }), h(async (req, res) => {
     res.json(await u.servicos.obter(est(req), req.params.id));

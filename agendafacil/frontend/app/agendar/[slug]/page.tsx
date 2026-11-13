@@ -1,112 +1,171 @@
-
 'use client';
 
 import { useParams } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import Calendario from '@/components/Calendario';
+import NavPublica from '@/components/NavPublica';
+import TelaCodigo from '@/components/TelaCodigo';
 import { api, ApiError, brl, hoje, localParaUTC, mensagemDeErro } from '@/lib/api';
+import { formatarWhatsapp, whatsappE164 } from '@/lib/formatar';
+import { salvarCodigo } from '@/lib/meus-agendamentos';
 import { aplicarTema, limparTema } from '@/lib/temas';
+import '../agendar.css';
+
+interface Servico {
+  id: string;
+  nome: string;
+  duracaoMinutos: number;
+  preco?: number;
+  fotoUrl?: string | null;
+  descricao?: string | null;
+}
 
 interface Pagina {
   id: string;
   nome: string;
   fusoHorario: string;
+  tituloAgenda: string | null;
   catalogoPublico: boolean;
+  whatsapp: boolean;
   mensagemCancelamento: string;
   horariosFuncionamento: { diaSemana: number; inicio: string; fim: string }[];
   logoUrl: string | null;
   tema: string;
-  servicos: {
-    id: string;
-    nome: string;
-    duracaoMinutos: number;
-    preco?: number;
-    fotoUrl?: string;
-  }[];
-  profissionais: {
-    id: string;
-    nome: string;
-    servicoIds: string[];
-  }[];
+  servicos: Servico[];
+  profissionais: { id: string; nome: string; servicoIds: string[] }[];
 }
+
+const DIAS_SEMANA = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
 
 export default function Agendar() {
   const { slug } = useParams<{ slug: string }>();
   const [pag, setPag] = useState<Pagina | null>(null);
   const [indisponivel, setIndisponivel] = useState(false);
-  const [servicoId, setServicoId] = useState('');
+
+  // Modal de agendamento
+  const [servico, setServico] = useState<Servico | null>(null);
   const [profId, setProfId] = useState('');
-  const [data, setData] = useState(hoje());
+  const [data, setData] = useState('');
   const [horarios, setHorarios] = useState<string[] | null>(null);
   const [hora, setHora] = useState('');
-  const [aviso, setAviso] = useState('');
-  const [codigo, setCodigo] = useState('');
+  const [nome, setNome] = useState('');
   const [whatsapp, setWhatsapp] = useState('');
-  const DIAS_SEMANA = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+  const [aviso, setAviso] = useState('');
+  const [enviando, setEnviando] = useState(false);
+
+  // Resultado
+  const [codigo, setCodigo] = useState('');
+  const [cancelado, setCancelado] = useState(false);
+  const [erroCancelar, setErroCancelar] = useState('');
+
+  const servicosRef = useRef<HTMLElement>(null);
+  const primeiroCampo = useRef<HTMLSelectElement>(null);
 
   useEffect(() => {
-    api<Pagina>(`/estabelecimentos/${slug}`)
-      .then(setPag)
-      .catch(() => setIndisponivel(true));
+    api<Pagina>(`/estabelecimentos/${slug}`).then(setPag).catch(() => setIndisponivel(true));
   }, [slug]);
 
-  // Aplica o tema do estabelecimento quando os dados forem carregados.
+  // Tema do Contratante (Lima, Oceano, Rosa neon, Âmbar, Claro).
   useEffect(() => {
     if (!pag) return;
-
     aplicarTema(pag.tema);
-
     return () => limparTema();
   }, [pag]);
 
+  const profs = useMemo(
+    () => (pag && servico ? pag.profissionais.filter((p) => p.servicoIds.includes(servico.id)) : []),
+    [pag, servico],
+  );
+  const diasAbertos = useMemo(
+    () => (pag && pag.horariosFuncionamento.length > 0 ? [...new Set(pag.horariosFuncionamento.map((h) => h.diaSemana))] : undefined),
+    [pag],
+  );
+
   const carregarHorarios = useCallback(async () => {
-    if (!servicoId || !profId) return;
-
+    if (!servico || !profId || !data) {
+      setHorarios(null);
+      return;
+    }
     setHora('');
-
     try {
       const r = await api<{ horarios: string[] }>(
-        `/estabelecimentos/${slug}/horarios?profissionalId=${profId}&servicoId=${servicoId}&data=${data}`
+        `/estabelecimentos/${slug}/horarios?profissionalId=${profId}&servicoId=${servico.id}&data=${data}`,
       );
-
       setHorarios(r.horarios);
     } catch (e) {
       setAviso(mensagemDeErro(e));
     }
-  }, [slug, servicoId, profId, data]);
+  }, [slug, servico, profId, data]);
 
   useEffect(() => {
     void carregarHorarios();
   }, [carregarHorarios]);
 
+  function abrir(s: Servico) {
+    setServico(s);
+    setData('');
+    setHora('');
+    setHorarios(null);
+    setAviso('');
+    const candidatos = pag!.profissionais.filter((p) => p.servicoIds.includes(s.id));
+    setProfId(candidatos.length === 1 ? candidatos[0].id : '');
+  }
+
+  function fechar() {
+    setServico(null);
+  }
+
+  // Esc fecha o modal; a página de trás não rola enquanto ele está aberto.
+  useEffect(() => {
+    if (!servico) return;
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && fechar();
+    document.addEventListener('keydown', onKey);
+    const anterior = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    primeiroCampo.current?.focus();
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = anterior;
+    };
+  }, [servico]);
+
   async function confirmar(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-
-    const f = new FormData(e.currentTarget);
+    if (!pag || !servico) return;
     setAviso('');
-
-    // "HH:mm" local do Contratante → ISO UTC. O backend valida o horário contra a grade.
-    const dataHora = localParaUTC(data, hora, pag!.fusoHorario);
-
+    setEnviando(true);
     try {
       const r = await api<{ codigo: string }>('/agendamentos', {
         method: 'POST',
         body: {
-          estabelecimentoId: pag!.id,
+          estabelecimentoId: pag.id,
           profissionalId: profId,
-          servicoId,
-          nomeCliente: f.get('nome'),
-          whatsappCliente: `+55${whatsapp.replace(/\D/g, '')}`, 
-          dataHora,
+          servicoId: servico.id,
+          nomeCliente: nome,
+          whatsappCliente: whatsappE164(whatsapp),
+          // "HH:mm" no fuso do Contratante → ISO UTC. O backend valida o horário contra a grade.
+          dataHora: localParaUTC(data, hora, pag.fusoHorario),
         },
       });
-
+      salvarCodigo(slug, r.codigo);
       setCodigo(r.codigo);
+      setCancelado(false);
+      setServico(null);
     } catch (err) {
       setAviso(mensagemDeErro(err));
+      if (err instanceof ApiError && err.code === 'HORARIO_INDISPONIVEL') await carregarHorarios();
+    } finally {
+      setEnviando(false);
+    }
+  }
 
-      if (err instanceof ApiError && err.code === 'HORARIO_INDISPONIVEL') {
-        await carregarHorarios(); // UC006.FS001
-      }
+  async function cancelar() {
+    setErroCancelar('');
+    try {
+      await api(`/agendamentos/${codigo}/status`, { method: 'PATCH', body: { status: 'CANCELADO' } });
+      setCancelado(true);
+    } catch (e) {
+      setErroCancelar(mensagemDeErro(e));
     }
   }
 
@@ -118,236 +177,141 @@ export default function Agendar() {
       </main>
     );
   }
-
   if (!pag) {
     return (
-      <main className="narrow">
-        <p>Carregando…</p>
-      </main>
+      <div className="ag">
+        <p style={{ padding: '2rem' }}>Carregando…</p>
+      </div>
     );
   }
 
   if (codigo) {
     return (
-      <main className="narrow">
-        <h1>Agendamento confirmado</h1>
-        <div className="card">
-          <p>Seu código:</p>
-          <p className="preco">{codigo}</p>
-          <p>
-            <a href={`/cancelar/${codigo}`}>
-              Precisa cancelar? Use este link.
-            </a>
-          </p>
-          <p>
-            Guarde o código: ele é a única forma de cancelar ou consultar o
-            agendamento.
-          </p>
-          <p className="aviso-cancelamento">{pag.mensagemCancelamento}</p>
-        </div>
-      </main>
+      <TelaCodigo
+        codigo={codigo}
+        estado={cancelado ? 'CANCELADO' : 'CONFIRMADO'}
+        whatsapp={pag.whatsapp}
+        aviso={cancelado ? undefined : pag.mensagemCancelamento}
+        erro={erroCancelar}
+        onVoltar={() => { setCodigo(''); setCancelado(false); }}
+        onCancelar={cancelar}
+      />
     );
   }
 
-  const profs = pag.profissionais.filter((p) =>
-    p.servicoIds.includes(servicoId)
-  );
-
   return (
-    <main className="narrow">
-      {pag.logoUrl && (
-        <img
-          src={pag.logoUrl}
-          alt={`Logo de ${pag.nome}`}
-          className="pub-logo"
-          onError={(e) => {
-            e.currentTarget.style.display = 'none';
-          }}
-        />
-      )}
+    <div className="ag">
+      <NavPublica slug={slug} nome={pag.nome} logoUrl={pag.logoUrl} ativo="home" />
 
-      <h1>{pag.nome}</h1>
-      <p className="pub-sub">Agende seu horário</p>
+      {/* 1ª tela: boas-vindas */}
+      <section className="ag-hero" aria-labelledby="ag-bemvindo">
+        <h1 id="ag-bemvindo">Bem-vindo!</h1>
+        <p className="chamada">{pag.tituloAgenda || 'Agende o seu horário!'}</p>
 
-      {pag.horariosFuncionamento.length > 0 && (
-        <section className="card horarios-publicos">
-          <h2>Horário de funcionamento</h2>
-          {DIAS_SEMANA.map((dia, indice) => {
-            const janela = pag.horariosFuncionamento.find((h) => h.diaSemana === indice);
+        {pag.horariosFuncionamento.length > 0 && (
+          <details>
+            <summary>Horário de funcionamento</summary>
+            {DIAS_SEMANA.map((dia, i) => {
+              const j = pag.horariosFuncionamento.find((h) => h.diaSemana === i);
+              return <p key={dia}><strong>{dia}:</strong> {j ? `${j.inicio} às ${j.fim}` : 'Fechado'}</p>;
+            })}
+          </details>
+        )}
+
+        <button
+          type="button"
+          className="ag-descer"
+          aria-label="Ver serviços"
+          onClick={() => servicosRef.current?.scrollIntoView({ behavior: 'smooth' })}
+        >
+          ↓
+        </button>
+      </section>
+
+      {/* 2ª tela: serviços */}
+      <section className="ag-servicos" ref={servicosRef} aria-labelledby="ag-titulo-servicos">
+        <h2 id="ag-titulo-servicos" className="sr-only">Serviços</h2>
+        {pag.servicos.length === 0 && <p>Nenhum serviço disponível no momento.</p>}
+        <div className="ag-grade">
+          {pag.servicos.map((s) => {
+            const foto = pag.catalogoPublico && s.fotoUrl ? s.fotoUrl : null;
             return (
-              <p key={dia}>
-                <strong>{dia}:</strong> {janela ? `${janela.inicio} às ${janela.fim}` : 'Fechado'}
-              </p>
+              <article key={s.id} className={`ag-card${foto ? ' com-foto' : ''}`}>
+                {foto && <img className="ag-foto" src={foto} alt="" onError={(e) => { e.currentTarget.style.visibility = 'hidden'; }} />}
+                <div className="ag-info">
+                  <h3>{s.nome}</h3>
+                  {pag.catalogoPublico && s.descricao && <p className="ag-desc">{s.descricao}</p>}
+                  {pag.catalogoPublico && s.preco !== undefined && <p className="ag-preco">{brl(s.preco)}</p>}
+                  <p className="ag-dur">{s.duracaoMinutos} min</p>
+                  <button type="button" className="ag-btn" onClick={() => abrir(s)} aria-label={`Agendar ${s.nome}`}>Agendar</button>
+                </div>
+              </article>
             );
           })}
-        </section>
-      )}
+        </div>
+      </section>
 
-      <h2>1. Escolha o serviço</h2>
+      {servico && (
+        <div className="ag-overlay" onMouseDown={(e) => e.target === e.currentTarget && fechar()}>
+          <div className="ag-modal" role="dialog" aria-modal="true" aria-labelledby="ag-modal-titulo">
+            <button type="button" className="ag-x" onClick={fechar} aria-label="Fechar">x</button>
+            <p className="servico-nome" id="ag-modal-titulo">{servico.nome} · {servico.duracaoMinutos} min</p>
 
-      <div role="radiogroup" aria-label="Serviço">
-        {pag.servicos.map((s) => (
-          <label
-            key={s.id}
-            className="card"
-            style={{ cursor: 'pointer' }}
-          >
-            <input
-              type="radio"
-              name="servico"
-              checked={servicoId === s.id}
-              onChange={() => {
-                setServicoId(s.id);
-                setProfId('');
-                setHorarios(null);
-              }}
-              style={{ width: 'auto' }}
-            />{' '}
-            <strong>{s.nome}</strong> · {s.duracaoMinutos} min{' '}
-            {pag.catalogoPublico && s.preco !== undefined && (
-              <> · {brl(s.preco)}</>
-            )}
+            <form onSubmit={confirmar}>
+              <label htmlFor="ag-prof">Profissional</label>
+              <select id="ag-prof" ref={primeiroCampo} value={profId} onChange={(e) => setProfId(e.target.value)} required>
+                <option value="">{profs.length === 0 ? 'Nenhum profissional disponível' : 'Escolher'}</option>
+                {profs.map((p) => <option key={p.id} value={p.id}>{p.nome}</option>)}
+              </select>
 
-            {pag.catalogoPublico && s.fotoUrl && (
-              <img
-                src={s.fotoUrl}
-                alt=""
-                style={{
-                  display: 'block',
-                  maxWidth: '100%',
-                  borderRadius: 8,
-                  marginTop: 8,
-                }}
-              />
-            )}
-          </label>
-        ))}
-      </div>
+              <div className="ag-cols">
+                <div className="ag-col">
+                  <h3 className="rotulo">Datas disponíveis</h3>
+                  <Calendario valor={data} min={hoje()} diasAbertos={diasAbertos} onChange={setData} />
 
-      {servicoId && (
-        <>
-          <h2>2. Profissional</h2>
+                  <label htmlFor="ag-hora">Horário</label>
+                  <select id="ag-hora" value={hora} onChange={(e) => setHora(e.target.value)} required disabled={!horarios || horarios.length === 0}>
+                    <option value="">
+                      {!profId || !data ? 'Escolha profissional e data' : horarios?.length === 0 ? 'Sem horários livres' : 'Escolher'}
+                    </option>
+                    {horarios?.map((h) => <option key={h} value={h}>{h}</option>)}
+                  </select>
+                </div>
 
-          {profs.length === 0 && (
-            <p>Nenhum profissional disponível para este serviço.</p>
-          )}
+                <div className="ag-col">
+                  <label htmlFor="ag-nome">Seu nome</label>
+                  <input id="ag-nome" value={nome} onChange={(e) => setNome(e.target.value)} required minLength={3} maxLength={150} autoComplete="name" />
 
-          <select
-            aria-label="Profissional"
-            value={profId}
-            onChange={(e) => setProfId(e.target.value)}
-          >
-            <option value="">Selecione…</option>
-            {profs.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.nome}
-              </option>
-            ))}
-          </select>
-        </>
-      )}
+                  <label htmlFor="ag-num">Seu número</label>
+                  <div className="ag-tel">
+                    <span aria-hidden="true">+55</span>
+                    <input
+                      id="ag-num"
+                      type="tel"
+                      inputMode="numeric"
+                      autoComplete="tel-national"
+                      required
+                      placeholder="(82) 99999-0000"
+                      value={whatsapp}
+                      maxLength={15}
+                      pattern="\(\d{2}\) \d{4,5}-\d{4}"
+                      title="Informe DDD e número de WhatsApp. O código +55 já está incluído."
+                      onChange={(e) => setWhatsapp(formatarWhatsapp(e.target.value))}
+                    />
+                  </div>
 
-      {profId && (
-        <>
-          <h2>3. Dia e horário</h2>
+                  {aviso && <p className="ag-erro" role="alert">{aviso}</p>}
+                  <button className="ag-btn grande" disabled={enviando || !hora}>
+                    {enviando ? 'Confirmando…' : 'Confirmar agendamento'}
+                  </button>
+                </div>
+              </div>
 
-          <input
-            type="date"
-            aria-label="Data"
-            min={hoje()}
-            value={data}
-            onChange={(e) => setData(e.target.value)}
-          />
-
-          <div className="slots" style={{ marginTop: '.75rem' }}>
-            {horarios?.length === 0 && (
-              <p>Sem horários livres neste dia.</p>
-            )}
-
-            {horarios?.map((h) => (
-              <button
-                key={h}
-                type="button"
-                aria-pressed={hora === h}
-                onClick={() => setHora(h)}
-              >
-                {h}
-              </button>
-            ))}
+              <p className="ag-politica" role="note"><strong>Política de cancelamento:</strong> {pag.mensagemCancelamento}</p>
+            </form>
           </div>
-        </>
+        </div>
       )}
-
-      {hora && (
-        <form
-          onSubmit={confirmar}
-          className="card"
-          style={{ marginTop: '1rem' }}
-        >
-          <h2>4. Seus dados</h2>
-
-          <div className="card aviso-cancelamento" role="note">
-            <strong>Política de cancelamento</strong>
-            <p>{pag.mensagemCancelamento}</p>
-          </div>
-
-          <label htmlFor="nome">Nome</label>
-          <input
-            id="nome"
-            name="nome"
-            required
-            minLength={3}
-            maxLength={150}
-          />
-
-          <label htmlFor="whatsappNumero">WhatsApp</label>
-          <div className="whatsapp-com-prefixo">
-            <span aria-hidden="true">(+55)</span>
-            <input
-              id="whatsappNumero"
-              name="whatsappNumero"
-              type="tel"
-              required
-              inputMode="numeric"
-              autoComplete="tel-national"
-              placeholder="(82) 99999-0000"
-              value={whatsapp}
-              maxLength={15}
-              pattern="[0-9() \-]{10,15}"
-              title="Informe DDD e número de WhatsApp. O código +55 já está incluído."
-              onChange={(e) => {
-                const digits = e.target.value.replace(/\D/g, '').slice(0, 11);
-                let formatado = digits;
-                if (digits.length > 2) {
-                  formatado = `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
-                }
-                if (digits.length > 7) {
-                  const ddd = digits.slice(0, 2);
-                  const numero = digits.slice(2);
-                  formatado = `(${ddd}) ${numero.slice(0, numero.length === 9 ? 5 : 4)}-${numero.slice(numero.length === 9 ? 5 : 4)}`;
-                }
-                setWhatsapp(formatado);
-              }}
-            />
-          </div>
-
-          {aviso && (
-            <p className="erro" role="alert">
-              {aviso}
-            </p>
-          )}
-
-          <p>
-            <button>Confirmar agendamento às {hora}</button>
-          </p>
-        </form>
-      )}
-
-      {!hora && aviso && (
-        <p className="erro" role="alert">
-          {aviso}
-        </p>
-      )}
-    </main>
+    </div>
   );
 }

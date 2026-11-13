@@ -106,7 +106,7 @@ Erro padrão: `{ "error": "CODIGO", "message": "texto" }`. Zod: `422` com `VALID
 
 - **Estabelecimento (Contratante):** `id`, `nome`, `slug` (único), `cnpjCpf` (único), `email` (único), `telefone`, `senhaHash`, `catalogoPublico`, `plano`, `status` (`ATIVO`|`SUSPENSO`|`CANCELADO`), `fusoHorario`, `intervaloGradeMinutos`, `tituloAgenda?`, `logoUrl?`, `createdAt`.
 - **HorarioFuncionamento** (do Contratante) e **HorarioAtendimento** (do Profissional): dia da semana, início, fim.
-- **Profissional:** `id`, `estabelecimentoId`, `nome`, `ativo`. **Serviço:** `id`, `estabelecimentoId`, `nome`, `preco`, `duracaoMinutos`, `fotoUrl?`, `ativo`. **ProfissionalServico:** N:N.
+- **Profissional:** `id`, `estabelecimentoId`, `nome`, `ativo`. **Serviço:** `id`, `estabelecimentoId`, `nome`, `preco`, `duracaoMinutos`, `fotoUrl?`, `descricao?` (até 120 caracteres, só exibida com catálogo público), `ativo`. **ProfissionalServico:** N:N.
 - **Agendamento:** `id`, `codigo` (único, 8 chars), `estabelecimentoId`, `profissionalId`, `servicoId`, `nomeCliente`, `whatsappCliente`, `dataHora` (UTC), `status`, `createdAt`, `updatedAt`. FKs de profissional/serviço são `RESTRICT`.
 - **Assinatura:** `estabelecimentoId` (1:1), `plano`, `valorMensal`, `status` (`ATIVA`|`EM_ATRASO`|`SUSPENSA`|`CANCELADA`), `planoAgendado?`, `cancelarNoFimDoCiclo`, `inicio`, `proximaCobranca`.
 - **Cobranca:** `assinaturaId`, `valor`, `vencimento`, `status` (`PENDENTE`|`PAGA`|`FALHA`), `pagoEm?`, `referenciaExterna?`.

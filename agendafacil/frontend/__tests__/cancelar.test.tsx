@@ -2,6 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Cancelar from '@/app/cancelar/[codigo]/page';
 import { localParaUTC } from '@/lib/api';
+import { formatarWhatsapp, whatsappE164 } from '@/lib/formatar';
 
 jest.mock('next/navigation', () => ({ useParams: () => ({ codigo: 'AF7K92XQ' }) }));
 
@@ -24,8 +25,20 @@ describe('/cancelar/[codigo]', () => {
     expect(screen.getByText(/Corte masculino com Rafael/)).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole('button', { name: 'Cancelar agendamento' }));
+    expect(screen.getByText(/Você tem certeza\?/)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Sim' }));
     await waitFor(() => expect(screen.getByRole('heading', { name: 'Agendamento cancelado' })).toBeInTheDocument());
-    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fetchMock).toHaveBeenCalledTimes(3); // agendamento, página do Contratante (tema), cancelamento
+  });
+
+  it('"Não" fecha a confirmação sem cancelar', async () => {
+    fetchMock.mockResolvedValue(resposta(agendamento));
+    render(<Cancelar />);
+    await screen.findByText('Barbearia Souza');
+    await userEvent.click(screen.getByRole('button', { name: 'Cancelar agendamento' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Não' }));
+    expect(screen.queryByText(/Você tem certeza\?/)).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Agendamento confirmado!' })).toBeInTheDocument();
   });
 
   it('exibe o erro quando o código não existe', async () => {
@@ -38,5 +51,14 @@ describe('/cancelar/[codigo]', () => {
 describe('localParaUTC', () => {
   it('converte horário de Maceio (UTC-3) para UTC', () => {
     expect(localParaUTC('2026-10-15', '14:00', 'America/Maceio')).toBe('2026-10-15T17:00:00.000Z');
+  });
+});
+
+describe('formatarWhatsapp', () => {
+  it('aplica a máscara de celular e fixo e gera E.164 com +55', () => {
+    expect(formatarWhatsapp('82999990000')).toBe('(82) 99999-0000');
+    expect(formatarWhatsapp('8232221111')).toBe('(82) 3222-1111');
+    expect(formatarWhatsapp('829')).toBe('(82) 9');
+    expect(whatsappE164('(82) 99999-0000')).toBe('+5582999990000');
   });
 });

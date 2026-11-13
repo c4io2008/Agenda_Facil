@@ -54,6 +54,8 @@ export interface Servico {
   preco: number;
   duracaoMinutos: number;
   fotoUrl: string | null;
+  /** Texto curto (até 120 caracteres) exibido no catálogo público. */
+  descricao: string | null;
   ativo: boolean;
 }
 

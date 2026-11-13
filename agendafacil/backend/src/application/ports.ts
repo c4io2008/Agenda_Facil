@@ -97,6 +97,7 @@ export interface DadosServico {
   preco: number;
   duracaoMinutos: number;
   fotoUrl: string | null;
+  descricao: string | null;
 }
 
 export interface ServicoRepo {

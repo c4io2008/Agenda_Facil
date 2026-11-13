@@ -504,3 +504,23 @@ describe('Backoffice da plataforma', () => {
     await request(a.app).get('/api/v1/plataforma/estabelecimentos').set(bearer(t)).expect(403);
   });
 });
+
+describe('Descrição do serviço no catálogo público', () => {
+  it('PREMIUM com catálogo: expõe descricao; limite de 120 caracteres', async () => {
+    const t = await criarTenant(a, { plano: 'PREMIUM' });
+    await request(a.app).patch('/api/v1/estabelecimentos/me').set(bearer(t)).send({ catalogoPublico: true }).expect(200);
+    await request(a.app).patch(`/api/v1/servicos/${t.servicoId}`).set(bearer(t)).send({ descricao: 'x'.repeat(121) }).expect(422);
+    await request(a.app).patch(`/api/v1/servicos/${t.servicoId}`).set(bearer(t)).send({ descricao: 'Degradê na régua com acabamento.' }).expect(200);
+    const pub = await request(a.app).get(`/api/v1/estabelecimentos/${t.slug}`).expect(200);
+    expect(pub.body.servicos[0].descricao).toBe('Degradê na régua com acabamento.');
+    expect(pub.body.whatsapp).toBe(true);
+  });
+
+  it('BASICO: a página pública não expõe descricao', async () => {
+    const t = await criarTenant(a, { plano: 'BASICO' });
+    await request(a.app).patch(`/api/v1/servicos/${t.servicoId}`).set(bearer(t)).send({ descricao: 'Texto' }).expect(200);
+    const pub = await request(a.app).get(`/api/v1/estabelecimentos/${t.slug}`).expect(200);
+    expect(pub.body.servicos[0]).not.toHaveProperty('descricao');
+    expect(pub.body.whatsapp).toBe(false);
+  });
+});

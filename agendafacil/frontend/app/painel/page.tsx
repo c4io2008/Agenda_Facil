@@ -25,6 +25,7 @@ interface Servico {
   preco: number;
   duracaoMinutos: number;
   fotoUrl: string | null;
+  descricao: string | null;
 }
 
 interface Prof {
@@ -151,6 +152,7 @@ export default function Painel() {
           preco: Number(f.get('preco')),
           duracaoMinutos: Number(f.get('duracao')),
           fotoUrl: f.get('foto') || null,
+          descricao: f.get('descricao') || null,
         },
       });
 
@@ -179,7 +181,7 @@ export default function Painel() {
           preco: Number(f.get('preco')),
           duracaoMinutos: Number(f.get('duracao')),
           ...(ass?.recursos.catalogoPublico
-            ? { fotoUrl: (f.get('foto') as string) || null }
+            ? { fotoUrl: (f.get('foto') as string) || null, descricao: (f.get('descricao') as string) || null }
             : {}),
         },
       });
@@ -544,6 +546,8 @@ export default function Painel() {
                 <>
                   <label htmlFor="sf">Foto (URL)</label>
                   <input id="sf" name="foto" type="url" />
+                  <label htmlFor="sdesc">Descrição (até 120 caracteres)</label>
+                  <input id="sdesc" name="descricao" maxLength={120} />
                 </>
               )}
 
@@ -725,6 +729,8 @@ export default function Painel() {
                           type="url"
                           defaultValue={s.fotoUrl ?? ''}
                         />
+                      <label htmlFor={`ed-${s.id}`}>Descrição (até 120 caracteres)</label>
+                        <input id={`ed-${s.id}`} name="descricao" maxLength={120} defaultValue={s.descricao ?? ''} />
                       </>
                     )}
 

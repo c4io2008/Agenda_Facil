@@ -28,9 +28,10 @@ export class ObterPaginaPublicaUseCase {
       tema: est.tema,
       logoUrl: POLITICA_PLANOS[est.plano].logoPersonalizada ? est.logoUrl : null,
       catalogoPublico: exibeCatalogo,
+      whatsapp: POLITICA_PLANOS[est.plano].whatsapp,
       servicos: servicos.map((s) =>
         exibeCatalogo
-          ? { id: s.id, nome: s.nome, preco: s.preco, duracaoMinutos: s.duracaoMinutos, fotoUrl: s.fotoUrl }
+          ? { id: s.id, nome: s.nome, preco: s.preco, duracaoMinutos: s.duracaoMinutos, fotoUrl: s.fotoUrl, descricao: s.descricao }
           : { id: s.id, nome: s.nome, duracaoMinutos: s.duracaoMinutos },
       ),
       profissionais: profissionais.map((p) => ({ id: p.id, nome: p.nome, servicoIds: p.servicoIds })),

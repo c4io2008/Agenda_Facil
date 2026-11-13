@@ -126,6 +126,7 @@ model Servico {
   preco             Decimal  @db.Decimal(8, 2)
   duracaoMinutos    Int      @map("duracao_minutos")
   fotoUrl           String?  @map("foto_url") @db.VarChar(255)
+  descricao         String?  @db.VarChar(120)
   ativo             Boolean  @default(true)
   createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz
 

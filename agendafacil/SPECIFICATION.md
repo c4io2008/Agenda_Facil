@@ -162,6 +162,7 @@ CREATE TABLE servicos (
     preco NUMERIC(8,2) NOT NULL,
     duracao_minutos INTEGER NOT NULL CHECK (duracao_minutos > 0),
     foto_url VARCHAR(255),
+    descricao VARCHAR(120),                       -- texto curto exibido no catálogo público
     ativo BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
@@ -300,7 +301,7 @@ export const POLITICA_PLANOS = {
   "logoUrl": "https://.../logo.png",
   "catalogoPublico": true,
   "servicos": [
-    { "id": "c9bf9e57-1685-4c89-bafb-ff5af830be8a", "nome": "Corte masculino", "preco": 40.00, "duracaoMinutos": 30, "fotoUrl": "https://..." }
+    { "id": "c9bf9e57-1685-4c89-bafb-ff5af830be8a", "nome": "Corte masculino", "preco": 40.00, "duracaoMinutos": 30, "fotoUrl": "https://...", "descricao": "Corte na tesoura ou máquina." }
   ],
   "profissionais": [
     { "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479", "nome": "Rafael", "servicoIds": ["c9bf9e57-1685-4c89-bafb-ff5af830be8a"] }
@@ -309,7 +310,8 @@ export const POLITICA_PLANOS = {
 ```
 * `id` (usado em `POST /agendamentos`), `fusoHorario` (para converter o horário escolhido em UTC) e `profissionais` (somente ativos, com os `servicoIds` que realizam) são necessários para o fluxo da página pública.
 * `tituloAgenda` e `logoUrl` podem ser `null`; `logoUrl` só é enviada se o plano tem `logoPersonalizada`.
-* Se `catalogoPublico = false` (ou plano ≠ `PREMIUM`), `preco` e `fotoUrl` **não são enviados**; só `id`, `nome` e `duracaoMinutos` (UC010.FS001).
+* A resposta traz `whatsapp` (boolean): se o plano envia mensagens, a tela de confirmação avisa que o cliente receberá o link de cancelamento pelo WhatsApp.
+* Se `catalogoPublico = false` (ou plano ≠ `PREMIUM`), `preco`, `fotoUrl` e `descricao` **não são enviados**; só `id`, `nome` e `duracaoMinutos` (UC010.FS001).
 * `404 Not Found`: slug inexistente ou Contratante `CANCELADO`.
 * `403 Forbidden` (`ASSINATURA_INATIVA`): Contratante `SUSPENSO`.
 
@@ -486,7 +488,12 @@ Pré-requisito de inicialização: `npx prisma migrate deploy` (ou `dev` em ambi
 
 ### 5.1 Página Pública `/agendar/[slug]`
 * **Cabeçalho:** logo (se houver), nome do negócio e `tituloAgenda` como subtítulo.
-* **Lista de serviços:** com nome, preço e foto apenas se catálogo público habilitado (`PREMIUM`); caso contrário, só os nomes.
+* **Tema:** todas as telas do Cliente Final seguem o tema escolhido pelo Contratante (Lima, Oceano, Rosa neon, Âmbar, Claro).
+* **Rolagem em duas telas:** (1) boas-vindas ("Bem-vindo!" + `tituloAgenda` ou "Agende o seu horário!", com seta para descer) e (2) lista de serviços em cartões.
+* **Barra de navegação:** nome/logo do negócio, "Home" e "Meus agendamentos" (`/agendar/[slug]/meus`, lista os códigos guardados neste navegador e permite digitar um código).
+* **Cartões de serviço:** nome, duração e botão "Agendar"; com catálogo público habilitado (`PREMIUM`) mostram também foto, descrição (até 120 caracteres) e preço.
+* **Modal "Agendar":** profissional (apenas ativos que realizam o serviço), calendário de datas (dias em que o negócio fecha ficam desabilitados), horário (somente livres), nome e número de WhatsApp (+55 fixo), política de cancelamento e "Confirmar agendamento".
+* **Confirmação:** "Agendamento confirmado!" com o código e "Cancelar agendamento" → pergunta "Você tem certeza?" (Sim/Não).
 * **Seleção de profissional:** apenas profissionais ativos e vinculados ao serviço escolhido.
 * **Grade de horários:** botões com os horários livres em tempo real.
 * **Formulário:** `nomeCliente` e `whatsappCliente`.
@@ -499,12 +506,12 @@ Pré-requisito de inicialização: `npx prisma migrate deploy` (ou `dev` em ambi
 * **Filtro:** por data/período (dia, semana, mês) e por profissional.
 * **Lista de agenda:** cartões com cliente, serviço, profissional, horário e status. Indicador de **falha de WhatsApp** (somente planos com WhatsApp).
 * **Banners de assinatura:** `EM_ATRASO` mostra aviso com prazo; `SUSPENSA` coloca o painel em modo somente leitura com botão de regularização.
-* **Formulários (na própria página):** cadastro de serviço (nome, preço, duração, foto), cadastro de profissional (nome, serviços, horários de atendimento), cancelamento de agendamento pelo Contratante.
+* **Formulários (na própria página):** cadastro de serviço (nome, preço, duração, foto, descrição), cadastro de profissional (nome, serviços, horários de atendimento), cancelamento de agendamento pelo Contratante.
 
 ### 5.3 Ações e Formulários
 * Agendar: `POST /api/v1/agendamentos`
 * Cancelar: `PATCH /api/v1/agendamentos/{codigo}/status`
-* Cadastrar serviço: `POST /api/v1/servicos` (`nome`, `preco`, `duracaoMinutos`, `fotoUrl`; o `estabelecimentoId` vem do JWT, nunca do body)
+* Cadastrar serviço: `POST /api/v1/servicos` (`nome`, `preco`, `duracaoMinutos`, `fotoUrl`, `descricao`; o `estabelecimentoId` vem do JWT, nunca do body)
 * Cadastrar profissional: `POST /api/v1/profissionais` (`nome`, `servicoIds`, `horariosAtendimento`)
 
 ---
@@ -631,7 +638,7 @@ Pré-requisito de inicialização: `npx prisma migrate deploy` (ou `dev` em ambi
 ### Cenário 8: Página pública esconde preços sem catálogo
 * **Dado** Contratante `BASICO` com serviços de preço definido
 * **Quando** `GET /api/v1/estabelecimentos/{slug}`
-* **Então** resposta lista serviços **sem** `preco` e **sem** `fotoUrl`.
+* **Então** resposta lista serviços **sem** `preco`, **sem** `fotoUrl` e **sem** `descricao`.
 
 ### Cenário 9: Assinatura suspensa bloqueia novos agendamentos
 * **Dado** Contratante com assinatura `SUSPENSA`

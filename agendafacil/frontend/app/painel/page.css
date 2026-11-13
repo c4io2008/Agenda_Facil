@@ -609,9 +609,11 @@ nav.nav .marca {
 }
 
 nav.nav .marca-logo {
-  height: 32px;
-  width: auto;
-  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  object-fit: cover;
+  border-radius: 50%; /* logo sempre redonda */
 }
 
 nav.nav a {

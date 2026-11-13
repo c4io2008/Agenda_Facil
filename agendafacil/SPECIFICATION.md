@@ -487,9 +487,9 @@ Pré-requisito de inicialização: `npx prisma migrate deploy` (ou `dev` em ambi
 | `/plataforma` | Equipe AgendaFácil | Lista de Contratantes, métricas, suspender/reativar. |
 
 ### 5.1 Página Pública `/agendar/[slug]`
-* **Cabeçalho:** logo (se houver), nome do negócio e `tituloAgenda` como subtítulo.
+* **Cabeçalho:** logo (se houver), nome do negócio. O `tituloAgenda` não aparece na página pública.
 * **Tema:** todas as telas do Cliente Final seguem o tema escolhido pelo Contratante (Lima, Oceano, Rosa neon, Âmbar, Claro).
-* **Rolagem em duas telas:** (1) boas-vindas ("Bem-vindo!" + `tituloAgenda` ou "Agende o seu horário!", com seta para descer) e (2) lista de serviços em cartões.
+* **Rolagem em duas telas:** (1) boas-vindas ("Bem-vindo!" + "Agende o seu horário!", texto fixo, com seta para descer) e (2) lista de serviços em cartões.
 * **Barra de navegação:** nome/logo do negócio, "Home" e "Meus agendamentos" (`/agendar/[slug]/meus`, lista os códigos guardados neste navegador e permite digitar um código).
 * **Cartões de serviço:** nome, duração e botão "Agendar"; com catálogo público habilitado (`PREMIUM`) mostram também foto, descrição (até 120 caracteres) e preço.
 * **Modal "Agendar":** profissional (apenas ativos que realizam o serviço), calendário de datas (dias em que o negócio fecha ficam desabilitados), horário (somente livres), nome e número de WhatsApp (+55 fixo), política de cancelamento e "Confirmar agendamento".
@@ -540,7 +540,7 @@ Pré-requisito de inicialização: `npx prisma migrate deploy` (ou `dev` em ambi
 * **RN-15 (Cobrança e inadimplência):** cobrança gerada em `proxima_cobranca`. Sem pagamento no vencimento ➔ `EM_ATRASO`. Passados `TOLERANCIA_DIAS_ATRASO` ➔ `SUSPENSA` e Contratante `SUSPENSO`. Pagamento reativa automaticamente.
 * **RN-16 (Exclusão protegida):** profissional ou serviço com agendamentos `CONFIRMADO` futuros não pode ser excluído (`409`). Para exclusão com histórico, aplica-se desativação (`ativo = false`): some da página pública, permanece nos relatórios e agendas passadas.
 * **RN-17 (Cancelamento de conta):** cancelar a assinatura mantém o serviço até o fim do ciclo pago. Depois, Contratante `CANCELADO`, página pública fora do ar e dados retidos conforme política da AgendaFácil antes da exclusão definitiva.
-* **RN-18 (Personalização):** `tituloAgenda` livre, até 60 caracteres, em qualquer plano (padrão exibido: "Agenda" no painel e "Agende seu horário" na página pública). `logoUrl` precisa ser `http(s)`, até 255 caracteres; esquemas como `javascript:` são rejeitados. Upload de arquivo não faz parte da v1.
+* **RN-18 (Personalização):** `tituloAgenda` livre, até 60 caracteres, em qualquer plano (exibido só como título da página Agenda no painel; padrão "Agenda". A página pública usa sempre o texto fixo "Agende o seu horário!"). `logoUrl` precisa ser `http(s)`, até 255 caracteres; esquemas como `javascript:` são rejeitados. Upload de arquivo não faz parte da v1.
 
 ### 6.2 Casos de Borda (CB)
 

@@ -24,7 +24,6 @@ interface Pagina {
   id: string;
   nome: string;
   fusoHorario: string;
-  tituloAgenda: string | null;
   catalogoPublico: boolean;
   whatsapp: boolean;
   mensagemCancelamento: string;
@@ -59,6 +58,7 @@ export default function Agendar() {
   const [erroCancelar, setErroCancelar] = useState('');
 
   const servicosRef = useRef<HTMLElement>(null);
+  const [rolou, setRolou] = useState(false); // já saiu da 1ª tela? (a seta passa a subir)
   const primeiroCampo = useRef<HTMLSelectElement>(null);
 
   useEffect(() => {
@@ -114,6 +114,13 @@ export default function Agendar() {
   function fechar() {
     setServico(null);
   }
+
+  useEffect(() => {
+    const onScroll = () => setRolou(window.scrollY > window.innerHeight * 0.4);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   // Esc fecha o modal; a página de trás não rola enquanto ele está aberto.
   useEffect(() => {
@@ -206,7 +213,7 @@ export default function Agendar() {
       {/* 1ª tela: boas-vindas */}
       <section className="ag-hero" aria-labelledby="ag-bemvindo">
         <h1 id="ag-bemvindo">Bem-vindo!</h1>
-        <p className="chamada">{pag.tituloAgenda || 'Agende o seu horário!'}</p>
+        <p className="chamada">Agende o seu horário!</p>
 
         {pag.horariosFuncionamento.length > 0 && (
           <details>
@@ -220,11 +227,11 @@ export default function Agendar() {
 
         <button
           type="button"
-          className="ag-descer"
-          aria-label="Ver serviços"
-          onClick={() => servicosRef.current?.scrollIntoView({ behavior: 'smooth' })}
+          className={`ag-descer${rolou ? ' sobe' : ''}`}
+          aria-label={rolou ? 'Voltar ao topo' : 'Ver serviços'}
+          onClick={() => (rolou ? window.scrollTo({ top: 0, behavior: 'smooth' }) : servicosRef.current?.scrollIntoView({ behavior: 'smooth' }))}
         >
-          ↓
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6" /></svg>
         </button>
       </section>
 

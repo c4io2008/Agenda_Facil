@@ -19,7 +19,8 @@
   color: var(--ag-texto);
   font-family: 'DM Sans', system-ui, sans-serif;
 }
-html:has(.ag) { scroll-snap-type: y proximity; scroll-behavior: smooth; }
+/* Rolagem livre: sem scroll-snap (ele puxava a página de volta ao início das seções). O padding compensa a nav fixa. */
+html:has(.ag) { scroll-behavior: smooth; scroll-padding-top: 4.5rem; }
 .ag h1, .ag h2, .ag h3 { font-family: 'Poppins', sans-serif; margin: 0; }
 .ag a:focus-visible, .ag button:focus-visible, .ag select:focus-visible, .ag input:focus-visible {
   outline: 3px solid var(--ag-a);
@@ -59,7 +60,7 @@ html:has(.ag) { scroll-snap-type: y proximity; scroll-behavior: smooth; }
   border-bottom: 3px solid var(--ag-a);
 }
 .ag-marca { display: inline-flex; align-items: center; gap: .6rem; color: var(--ag-a); font-size: 1.15rem; }
-.ag-marca img { height: 34px; max-width: 120px; width: auto; object-fit: contain; border-radius: 4px; }
+.ag-marca img { width: 40px; height: 40px; flex-shrink: 0; object-fit: cover; border-radius: 50%; } /* logo sempre redonda */
 .ag-nav nav { display: flex; gap: clamp(1rem, 3vw, 2.25rem); flex-wrap: wrap; }
 .ag-nav nav a { color: var(--ag-texto); text-decoration: none; font-size: 1.1rem; }
 .ag-nav nav a[aria-current='page'] { color: var(--ag-a); }
@@ -70,7 +71,6 @@ html:has(.ag) { scroll-snap-type: y proximity; scroll-behavior: smooth; }
   position: relative;
   min-height: calc(100vh - 4.5rem);
   min-height: calc(100dvh - 4.5rem);
-  scroll-snap-align: start;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -95,31 +95,38 @@ html:has(.ag) { scroll-snap-type: y proximity; scroll-behavior: smooth; }
 .ag-hero summary { cursor: pointer; color: var(--ag-a); }
 .ag-hero details p { margin: .25rem 0; }
 .ag-descer {
-  position: absolute;
-  left: 50%;
+  position: fixed; /* acompanha a rolagem: desce na 1ª tela e sobe nas demais */
+  z-index: 15;
+  left: 0;
+  right: 0;
+  margin-inline: auto; /* centraliza na tela sem depender de transform */
   bottom: 1.5rem;
   width: 3rem;
   height: 3rem;
   display: grid;
   place-items: center;
+  padding: 0;
   border: 2px solid var(--ag-a);
   border-radius: 50%;
-  background: transparent;
+  background: var(--ag-fundo);
   color: var(--ag-a);
-  font-size: 1.4rem;
   cursor: pointer;
-  transform: translateX(-50%);
   animation: ag-pulo 1.8s ease-in-out infinite;
 }
+.ag-descer svg, .ag-voltar svg { display: block; }
+.ag-descer.sobe { animation-name: ag-pulo-cima; }
+.ag-descer svg { transition: transform .25s; }
+.ag-descer.sobe svg { transform: rotate(180deg); }
+.ag-descer svg { width: 1.5rem; height: 1.5rem; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
 .ag-descer:hover { background: var(--ag-a); color: var(--ag-btn-texto); }
-@keyframes ag-pulo { 50% { transform: translate(-50%, 6px); } }
+@keyframes ag-pulo { 50% { transform: translateY(6px); } }
+@keyframes ag-pulo-cima { 50% { transform: translateY(-6px); } }
 
 /* ---------- Serviços (2ª tela) ---------- */
 .ag-servicos {
-  scroll-snap-align: start;
   scroll-margin-top: 4.5rem;
   min-height: calc(100vh - 4.5rem);
-  padding: 2.5rem clamp(1rem, 5vw, 4rem) 4rem;
+  padding: 2.5rem clamp(1rem, 5vw, 4rem) 6rem; /* espaço para a seta fixa */
 }
 .ag-grade {
   display: grid;
@@ -279,6 +286,7 @@ html:has(.ag) { scroll-snap-type: y proximity; scroll-behavior: smooth; }
   color: var(--ag-a);
   cursor: pointer;
   text-decoration: none;
+  padding: 0;
 }
 .ag-voltar svg { width: 1.6rem; height: 1.6rem; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
 .ag-codigo h1 { margin: 1.25rem 0 .75rem; font-weight: 800; font-size: clamp(2rem, 5vw, 3.1rem); letter-spacing: -.02em; color: var(--ag-a); }
